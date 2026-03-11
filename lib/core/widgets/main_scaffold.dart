@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../widgets/app_bottom_nav.dart';
 
 class MainScaffold extends ConsumerStatefulWidget {
@@ -20,19 +21,19 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
   void _onNavTap(int index) {
     switch (index) {
       case 0:
-        // Navigate to home/feed
+        context.go('/home');
         break;
       case 1:
-        // Navigate to pets
+        context.go('/pets');
         break;
       case 2:
-        // Navigate to store/products
+        context.go('/products');
         break;
       case 3:
-        // Navigate to feed
+        context.go('/feed');
         break;
       case 4:
-        // Navigate to settings
+        context.go('/settings');
         break;
     }
   }
@@ -40,10 +41,24 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: widget.child,
-      bottomNavigationBar: AppBottomNav(
-        currentIndex: widget.currentIndex,
-        onTap: _onNavTap,
+      backgroundColor: const Color(0xFFF7F8FA),
+      body: Stack(
+        children: [
+          // Main content padded to not go behind nav
+          Positioned.fill(
+            child: widget.child,
+          ),
+          // Floating bottom nav
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: AppBottomNav(
+              currentIndex: widget.currentIndex,
+              onTap: _onNavTap,
+            ),
+          ),
+        ],
       ),
     );
   }

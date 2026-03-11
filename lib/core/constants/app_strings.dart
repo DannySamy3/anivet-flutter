@@ -1,6 +1,6 @@
 class AppStrings {
   // App General
-  static const String appName = 'ANNIVET';
+  static const String appName = 'ANIVET';
   static const String appTagline = 'Your Pet\'s Health Partner';
 
   // Auth

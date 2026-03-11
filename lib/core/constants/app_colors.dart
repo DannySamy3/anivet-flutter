@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary Colors (Veterinary Theme)
-  static const Color primaryGreen = Color(0xFF4CAF50); // Health & nature
-  static const Color primaryBlue = Color(0xFF2196F3); // Trust & professionalism
+  // ANIVET Brand Colors (matched from anivet.co.tz)
+  static const Color primaryGreen =
+      Color(0xFFC2185B); // Magenta — "ANIVET" brand pink
+  static const Color primaryBlue =
+      Color(0xFF1A3558); // Navy blue — "VETERINARY CLINIC" text
+  static const Color brandOrange =
+      Color(0xFFF4511E); // Orange — tagline & logo accent line
 
   // Accent Colors
-  static const Color accentOrange = Color(0xFFFF9800); // Warm & friendly
+  static const Color accentOrange = Color(0xFFF4511E);
   static const Color accentPurple = Color(0xFF9C27B0);
 
   // Neutral Colors
-  static const Color textPrimary = Color(0xFF212121);
+  static const Color textPrimary = Color(0xFF1A3558); // Navy for headers
   static const Color textSecondary = Color(0xFF757575);
   static const Color textHint = Color(0xFFBDBDBD);
 
@@ -26,25 +30,32 @@ class AppColors {
   static const Color success = Color(0xFF4CAF50);
   static const Color warning = Color(0xFFFFC107);
   static const Color error = Color(0xFFF44336);
-  static const Color info = Color(0xFF2196F3);
+  static const Color info = Color(0xFF1A3558);
 
   // Boarding Status Colors
   static const Color statusPending = Color(0xFFFFC107);
   static const Color statusApproved = Color(0xFF4CAF50);
-  static const Color statusActive = Color(0xFF2196F3);
+  static const Color statusActive = Color(0xFF1A3558);
   static const Color statusCompleted = Color(0xFF9E9E9E);
   static const Color statusCancelled = Color(0xFFF44336);
 
-  // Gradient Colors
+  // Gradient Colors — brand magenta → navy (logo palette)
   static const LinearGradient primaryGradient = LinearGradient(
-    colors: [primaryGreen, primaryBlue],
+    colors: [Color(0xFFC2185B), Color(0xFF1A3558)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  // Pet Category Colors
-  static const Color catColor = Color(0xFFE91E63);
-  static const Color dogColor = Color(0xFF3F51B5);
-  static const Color birdColor = Color(0xFFFFEB3B);
+  // Orange accent gradient (login screen / CTAs)
+  static const LinearGradient orangeGradient = LinearGradient(
+    colors: [Color(0xFFF4511E), Color(0xFFFF8F00)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Pet Category Colors (from logo)
+  static const Color catColor = Color(0xFFC2185B); // Magenta — matches logo cat
+  static const Color dogColor = Color(0xFFF4511E); // Orange — matches logo dog
+  static const Color birdColor = Color(0xFF1A3558); // Navy — matches logo horse
   static const Color otherColor = Color(0xFF9E9E9E);
 }
