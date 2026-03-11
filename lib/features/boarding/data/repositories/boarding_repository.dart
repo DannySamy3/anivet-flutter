@@ -7,64 +7,80 @@ class BoardingRepository {
 
   BoardingRepository(this._apiService);
 
-  // POST /api/boarding - Request boarding
+  // POST /api/boardings - Create boarding request
+  // DO NOT send status or paidAmount - backend will set them
   Future<Boarding> createBoardingRequest(Map<String, dynamic> data) async {
-    final response = await _apiService.post('/boarding', data: data);
-    return Boarding.fromDto(BoardingDto.fromJson(response.data));
+    final response = await _apiService.post('/boardings', data: data);
+    final boardingData = response.data['data'] as Map<String, dynamic>;
+    return Boarding.fromDto(BoardingDto.fromJson(boardingData));
   }
 
-  // GET /api/boarding/me - My boardings
+  // GET /api/boardings/me - Get user's boardings
   Future<List<Boarding>> getMyBoardings() async {
-    final response = await _apiService.get('/boarding/me');
-    final List<dynamic> data = response.data as List<dynamic>;
+    final response = await _apiService.get('/boardings/me');
+    final List<dynamic> data = response.data['data'] as List<dynamic>? ?? [];
     return data
-        .map((json) => Boarding.fromDto(BoardingDto.fromJson(json)))
+        .map((json) => Boarding.fromDto(
+            BoardingDto.fromJson(json as Map<String, dynamic>)))
         .toList();
   }
 
-  // GET /api/boarding/:id - Get boarding by ID
+  // GET /api/boardings/:id - Get boarding by ID
   Future<Boarding> getBoardingById(String boardingId) async {
-    final response = await _apiService.get('/boarding/$boardingId');
-    return Boarding.fromDto(BoardingDto.fromJson(response.data));
+    final response = await _apiService.get('/boardings/$boardingId');
+    final boardingData = response.data['data'] as Map<String, dynamic>;
+    return Boarding.fromDto(BoardingDto.fromJson(boardingData));
   }
 
-  // GET /api/boarding - All boardings (admin)
+  // GET /api/boardings - Get all boardings (admin)
   Future<List<Boarding>> getAllBoardings() async {
-    final response = await _apiService.get('/boarding');
-    final List<dynamic> data = response.data as List<dynamic>;
+    final response = await _apiService.get('/boardings');
+    final List<dynamic> data = response.data['data'] as List<dynamic>? ?? [];
     return data
-        .map((json) => Boarding.fromDto(BoardingDto.fromJson(json)))
+        .map((json) => Boarding.fromDto(
+            BoardingDto.fromJson(json as Map<String, dynamic>)))
         .toList();
   }
 
-  // PATCH /api/boarding/:id/status - Update status (admin)
+  // PATCH /api/boardings/:id/status - Update boarding status
   Future<Boarding> updateBoardingStatus(
-      String boardingId, String status) async {
+    String boardingId,
+    String status,
+  ) async {
     final response = await _apiService.patch(
-      '/boarding/$boardingId/status',
+      '/boardings/$boardingId/status',
       data: {'status': status},
     );
-    return Boarding.fromDto(BoardingDto.fromJson(response.data));
+    final boardingData = response.data['data'] as Map<String, dynamic>;
+    return Boarding.fromDto(BoardingDto.fromJson(boardingData));
   }
 
-  // POST /api/boarding/:id/logs - Add boarding log (admin)
+  // GET /api/boardings/:id/billing - Get billing information
+  Future<Map<String, dynamic>> getBillingInfo(String boardingId) async {
+    final response = await _apiService.get('/boardings/$boardingId/billing');
+    return response.data['data'] as Map<String, dynamic>;
+  }
+
+  // POST /api/boardings/:id/logs - Add boarding log
   Future<BoardingLog> addBoardingLog(
     String boardingId,
     Map<String, dynamic> logData,
   ) async {
     final response = await _apiService.post(
-      '/boarding/$boardingId/logs',
+      '/boardings/$boardingId/logs',
       data: logData,
     );
-    return BoardingLog.fromDto(BoardingLogDto.fromJson(response.data));
+    return BoardingLog.fromDto(
+        BoardingLogDto.fromJson(response.data['data'] as Map<String, dynamic>));
   }
 
-  // GET boarding logs
+  // GET /api/boardings/:id/logs - Get boarding logs
   Future<List<BoardingLog>> getBoardingLogs(String boardingId) async {
-    final response = await _apiService.get('/boarding/$boardingId/logs');
-    final List<dynamic> data = response.data as List<dynamic>;
+    final response = await _apiService.get('/boardings/$boardingId/logs');
+    final List<dynamic> data = response.data['data'] as List<dynamic>? ?? [];
     return data
-        .map((json) => BoardingLog.fromDto(BoardingLogDto.fromJson(json)))
+        .map((json) => BoardingLog.fromDto(
+            BoardingLogDto.fromJson(json as Map<String, dynamic>)))
         .toList();
   }
 }

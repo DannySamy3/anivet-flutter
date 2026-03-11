@@ -6,7 +6,7 @@ enum HistoryType { vaccination, checkup, treatment, surgery, other }
 
 enum OrderStatus { pending, processing, shipped, delivered, cancelled }
 
-enum BoardingStatus { pending, approved, active, completed, cancelled }
+enum BoardingStatus { requested, approved, active, completed, cancelled }
 
 // Extension methods for UserRole
 extension UserRoleExtension on UserRole {
@@ -82,8 +82,8 @@ extension PetSpeciesExtension on PetSpecies {
 extension BoardingStatusExtension on BoardingStatus {
   String get displayName {
     switch (this) {
-      case BoardingStatus.pending:
-        return 'Pending';
+      case BoardingStatus.requested:
+        return 'Requested';
       case BoardingStatus.approved:
         return 'Approved';
       case BoardingStatus.active:
@@ -100,19 +100,19 @@ extension BoardingStatusExtension on BoardingStatus {
   }
 
   static BoardingStatus fromString(String status) {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return BoardingStatus.pending;
-      case 'approved':
+    switch (status.toUpperCase()) {
+      case 'REQUESTED':
+        return BoardingStatus.requested;
+      case 'APPROVED':
         return BoardingStatus.approved;
-      case 'active':
+      case 'ACTIVE':
         return BoardingStatus.active;
-      case 'completed':
+      case 'COMPLETED':
         return BoardingStatus.completed;
-      case 'cancelled':
+      case 'CANCELLED':
         return BoardingStatus.cancelled;
       default:
-        return BoardingStatus.pending;
+        return BoardingStatus.requested;
     }
   }
 }

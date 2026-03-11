@@ -45,9 +45,7 @@ class PetDetailScreen extends ConsumerWidget {
                   width: double.infinity,
                   height: 250,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-
-                  ),
+                  placeholder: (context, url) => Container(),
                 )
               else
                 Container(
@@ -96,7 +94,8 @@ class PetDetailScreen extends ConsumerWidget {
                       context,
                       icon: pet.gender == 'male' ? Icons.male : Icons.female,
                       label: 'Gender',
-                      value: pet.gender != null ? pet.gender!.toUpperCase() : '',
+                      value:
+                          pet.gender != null ? pet.gender!.toUpperCase() : '',
                     ),
                     _buildInfoRow(
                       context,
@@ -122,7 +121,7 @@ class PetDetailScreen extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(child: Text('Error loading pet: $error')),
     );
-      // All widget code referencing pet must be inside petQuery.when. No code should follow this block.
+    // All widget code referencing pet must be inside petQuery.when. No code should follow this block.
   }
 
   Widget _buildInfoRow(
@@ -157,21 +156,6 @@ class PetDetailScreen extends ConsumerWidget {
         ],
       ),
     );
-  }
-
-  IconData _getHistoryIcon(String type) {
-    switch (type.toLowerCase()) {
-      case 'vaccination':
-        return Icons.vaccines;
-      case 'checkup':
-        return Icons.health_and_safety;
-      case 'treatment':
-        return Icons.medical_services;
-      case 'surgery':
-        return Icons.local_hospital;
-      default:
-        return Icons.event_note;
-    }
   }
 
   void _showDeleteDialog(BuildContext context, WidgetRef ref) {

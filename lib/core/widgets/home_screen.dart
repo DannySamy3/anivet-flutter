@@ -23,7 +23,31 @@ class HomeScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Greeting
+            // App Logo
+            Center(
+              child: Image.asset(
+                'assets/images/app_logo.png',
+                height: 120,
+                width: 120,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 120,
+                    width: 120,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryGreen,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.pets,
+                      color: Colors.white,
+                      size: 60,
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 32),
             if (user != null) ...[
               Text(
                 'Hello, ${user.name}! 👋',

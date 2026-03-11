@@ -9,19 +9,21 @@ final boardingRepositoryProvider = Provider<BoardingRepository>((ref) {
   return BoardingRepository(apiService);
 });
 
-// FutureProvider: Get my boardings (customer)
+// ============ QUERIES ============
+
+/// Get my boardings (customer)
 final myBoardingsProvider = FutureProvider<List<Boarding>>((ref) async {
   final repository = ref.watch(boardingRepositoryProvider);
   return repository.getMyBoardings();
 });
 
-// FutureProvider: Get all boardings (admin)
+/// Get all boardings (admin)
 final allBoardingsProvider = FutureProvider<List<Boarding>>((ref) async {
   final repository = ref.watch(boardingRepositoryProvider);
   return repository.getAllBoardings();
 });
 
-// FutureProvider: Get boarding by ID
+/// Get boarding by ID
 final boardingDetailProvider = FutureProvider.family<Boarding, String>(
   (ref, boardingId) async {
     final repository = ref.watch(boardingRepositoryProvider);
@@ -29,7 +31,16 @@ final boardingDetailProvider = FutureProvider.family<Boarding, String>(
   },
 );
 
-// FutureProvider: Get boarding logs
+/// Get billing information for a boarding
+final boardingBillingProvider =
+    FutureProvider.family<Map<String, dynamic>, String>(
+  (ref, boardingId) async {
+    final repository = ref.watch(boardingRepositoryProvider);
+    return repository.getBillingInfo(boardingId);
+  },
+);
+
+/// Get boarding logs
 final boardingLogsProvider = FutureProvider.family<List<BoardingLog>, String>(
   (ref, boardingId) async {
     final repository = ref.watch(boardingRepositoryProvider);
@@ -37,46 +48,51 @@ final boardingLogsProvider = FutureProvider.family<List<BoardingLog>, String>(
   },
 );
 
-// FutureProvider: Create boarding request
+// ============ MUTATIONS ============
+
+/// Create boarding request
 final createBoardingProvider =
     FutureProvider.family<Boarding, Map<String, dynamic>>(
-  (ref, variables) async {
+  (ref, data) async {
     final repository = ref.watch(boardingRepositoryProvider);
-    final boarding = await repository.createBoardingRequest(variables);
-    // Invalidate cache on success
-    ref.invalidate(myBoardingsProvider);
+    final boarding = await repository.createBoardingRequest(data);
+    // Refresh cache on success
+    await ref.refresh(myBoardingsProvider);
+    await ref.refresh(allBoardingsProvider);
     return boarding;
   },
 );
 
-// FutureProvider: Update boarding status (admin)
+/// Update boarding status
 final updateBoardingStatusProvider =
-    FutureProvider.family<Boarding, Map<String, dynamic>>(
-  (ref, variables) async {
+    FutureProvider.family<Boarding, ({String boardingId, String status})>(
+  (ref, params) async {
     final repository = ref.watch(boardingRepositoryProvider);
-    final boardingId = variables['boardingId'] as String;
-    final status = variables['status'] as String;
-    final boarding = await repository.updateBoardingStatus(boardingId, status);
-    // Invalidate related cache on success
-    ref.invalidate(boardingDetailProvider(boardingId));
-    ref.invalidate(allBoardingsProvider);
-    ref.invalidate(myBoardingsProvider);
+    final boarding = await repository.updateBoardingStatus(
+      params.boardingId,
+      params.status,
+    );
+    // Refresh related cache on success
+    await ref.refresh(boardingDetailProvider(params.boardingId));
+    await ref.refresh(boardingBillingProvider(params.boardingId));
+    await ref.refresh(allBoardingsProvider);
+    await ref.refresh(myBoardingsProvider);
     return boarding;
   },
 );
 
-// FutureProvider: Add boarding log (admin)
-final addBoardingLogProvider =
-    FutureProvider.family<BoardingLog, Map<String, dynamic>>(
-  (ref, variables) async {
+/// Add boarding log
+final addBoardingLogProvider = FutureProvider.family<BoardingLog,
+    ({String boardingId, Map<String, dynamic> logData})>(
+  (ref, params) async {
     final repository = ref.watch(boardingRepositoryProvider);
-    final boardingId = variables['boardingId'] as String;
-    final logData = Map<String, dynamic>.from(variables);
-    logData.remove('boardingId');
-    final log = await repository.addBoardingLog(boardingId, logData);
-    // Invalidate related cache on success
-    ref.invalidate(boardingLogsProvider(boardingId));
-    ref.invalidate(boardingDetailProvider(boardingId));
+    final log = await repository.addBoardingLog(
+      params.boardingId,
+      params.logData,
+    );
+    // Refresh related cache on success
+    await ref.refresh(boardingLogsProvider(params.boardingId));
+    await ref.refresh(boardingDetailProvider(params.boardingId));
     return log;
   },
 );

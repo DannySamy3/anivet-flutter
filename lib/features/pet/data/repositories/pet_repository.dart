@@ -54,7 +54,6 @@ class PetRepository {
   // Get pet history
   Future<List<PetHistory>> getPetHistory(String petId) async {
     final response = await _apiService.get('/pets/$petId/history');
-    final List<dynamic> historyJson = response.data as List<dynamic>;
     // TODO: Create PetHistoryDto and parse
     return [];
   }

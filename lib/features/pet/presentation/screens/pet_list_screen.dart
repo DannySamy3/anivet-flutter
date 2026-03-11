@@ -56,7 +56,7 @@ class PetListScreen extends ConsumerWidget {
 
           return RefreshIndicator(
             onRefresh: () async {
-              ref.refresh(myPetsProvider);
+              await ref.refresh(myPetsProvider);
             },
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
@@ -74,7 +74,7 @@ class PetListScreen extends ConsumerWidget {
         loading: () => const LoadingIndicator(),
         error: (error, stackTrace) => AppErrorWidget(
           message: error.toString(),
-          onRetry: () => ref.refresh(myPetsProvider),
+          onRetry: () => ref.invalidate(myPetsProvider),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(

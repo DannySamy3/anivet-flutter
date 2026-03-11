@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../providers/order_providers.dart';
 import '../../../../core/widgets/loading_indicator.dart';
 import '../../../../core/widgets/app_error_widget.dart';
-import '../../../../core/constants/app_colors.dart';
 
 class AdminOrdersScreen extends ConsumerWidget {
   const AdminOrdersScreen({super.key});

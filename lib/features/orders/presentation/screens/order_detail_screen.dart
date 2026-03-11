@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../providers/order_providers.dart';
 import '../../../../core/widgets/loading_indicator.dart';
 import '../../../../core/widgets/app_error_widget.dart';

@@ -14,6 +14,7 @@ import 'package:annivet/features/feed/routes.dart';
 import 'package:annivet/features/boarding/routes.dart';
 import 'package:annivet/features/settings/routes.dart';
 import 'package:annivet/features/reminders/routes.dart';
+import 'package:annivet/features/medical_records/routes.dart';
 import 'package:annivet/core/widgets/home_screen.dart';
 import 'package:annivet/features/products/presentation/screens/admin_products_screen.dart';
 import 'package:annivet/features/products/presentation/screens/product_form_screen.dart';
@@ -36,7 +37,7 @@ class App extends ConsumerWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp.router(
-          title: 'ANNIVET',
+          title: 'Anivet',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme(),
           darkTheme: AppTheme.darkTheme(),
@@ -96,6 +97,7 @@ class App extends ConsumerWidget {
             ...boardingRoutes,
             ...settingsRoutes,
             ...reminderRoutes,
+            ...medicalRecordRoutes,
 
             // Admin routes for products
             GoRoute(

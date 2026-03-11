@@ -41,7 +41,7 @@ class MyBoardingsScreen extends ConsumerWidget {
                     title: Text('Boarding #${boarding.id.substring(0, 8)}'),
                     subtitle: Text(
                       'Check-in: ${_formatDate(boarding.checkIn)}\n'
-                      'Days: ${boarding.daysBooked} • KSh ${boarding.totalCost.toStringAsFixed(2)}',
+                      'Days: ${boarding.numberOfDays} • KSh ${boarding.totalAmount.toStringAsFixed(2)}',
                     ),
                     trailing: Chip(
                       label: Text(boarding.status.toUpperCase()),

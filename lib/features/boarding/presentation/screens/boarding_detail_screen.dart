@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../providers/boarding_providers.dart';
 import '../widgets/boarding_log_widget.dart';
 import '../../../../core/widgets/loading_indicator.dart';
@@ -62,27 +61,25 @@ class BoardingDetailScreen extends ConsumerWidget {
                             ? _formatDate(boarding.checkOut!)
                             : 'Not set',
                       ),
-                      _buildInfoRow(
-                          context, 'Days Booked', '${boarding.daysBooked}'),
+                      _buildInfoRow(context, 'Days Booked',
+                          '${boarding.numberOfDays}'),
                       _buildInfoRow(context, 'Daily Rate',
                           'KSh ${boarding.dailyRate.toStringAsFixed(2)}'),
                       _buildInfoRow(context, 'Total Cost',
-                          'KSh ${boarding.totalCost.toStringAsFixed(2)}'),
-                      if (boarding.instructions != null) ...[
-                        const Divider(height: 24),
-                        Text(
-                          'Special Instructions',
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(boarding.instructions!),
-                      ],
+                          'KSh ${boarding.totalAmount.toStringAsFixed(2)}'),
+                      const Divider(height: 24),
+                      Text(
+                        'Special Instructions',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      const SizedBox(height: 8),
+                      if (boarding.specialInstructions != null)
+                        Text(boarding.specialInstructions!),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 24),
-
               // Daily logs section
               Text(
                 'Daily Care Logs',
@@ -160,10 +157,10 @@ class BoardingDetailScreen extends ConsumerWidget {
   }
 
   Color _getStatusColor(String status) {
-    switch (status) {
-      case 'pending':
+    switch (status.toLowerCase()) {
+      case 'requested':
         return Colors.orange.withOpacity(0.3);
-      case 'confirmed':
+      case 'approved':
         return Colors.blue.withOpacity(0.3);
       case 'active':
         return Colors.green.withOpacity(0.3);

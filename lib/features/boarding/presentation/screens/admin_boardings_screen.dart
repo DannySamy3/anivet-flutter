@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../providers/boarding_providers.dart';
 import '../../../../core/widgets/loading_indicator.dart';
 import '../../../../core/widgets/app_error_widget.dart';
-import '../../../../core/constants/app_colors.dart';
 
 class AdminBoardingsScreen extends ConsumerWidget {
   const AdminBoardingsScreen({super.key});
@@ -175,7 +174,7 @@ class AdminBoardingsScreen extends ConsumerWidget {
     try {
       // Call the updateBoardingStatusProvider with the parameters
       await ref.read(updateBoardingStatusProvider(
-          {'boardingId': boardingId, 'status': newStatus}).future);
+          (boardingId: boardingId, status: newStatus)).future);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Boarding status updated to $newStatus')),

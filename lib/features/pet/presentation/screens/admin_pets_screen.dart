@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import '../providers/pet_providers.dart';
 import '../../../../core/widgets/loading_indicator.dart';
 import '../../../../core/widgets/app_error_widget.dart';
-import '../../../../core/constants/app_strings.dart';
 import '../widgets/pet_card.dart';
 
 class AdminPetsScreen extends ConsumerWidget {
@@ -34,7 +33,7 @@ class AdminPetsScreen extends ConsumerWidget {
 
           return RefreshIndicator(
             onRefresh: () async {
-              ref.refresh(allPetsProvider);
+              ref.invalidate(allPetsProvider);
             },
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
