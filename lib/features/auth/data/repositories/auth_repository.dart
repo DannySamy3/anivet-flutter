@@ -10,14 +10,19 @@ class AuthRepository {
 
   AuthRepository(this._apiService, this._storageService);
 
-  // Login
   Future<User> login(LoginRequest request) async {
     final response = await _apiService.post(
-      '/auth/login',
+      'auth/login',
       data: request.toJson(),
     );
 
-    final authResponse = AuthResponse.fromJson(response.data);
+    final dynamic respData = response.data;
+    final Map<String, dynamic> authData =
+        (respData is Map && respData.containsKey('data'))
+            ? respData['data']
+            : respData;
+
+    final authResponse = AuthResponse.fromJson(authData);
 
     // Save token and user data
     await _storageService.saveToken(authResponse.token);
@@ -28,14 +33,19 @@ class AuthRepository {
     return userDto.toEntity();
   }
 
-  // Register
   Future<User> register(RegisterRequest request) async {
     final response = await _apiService.post(
-      '/auth/register',
+      'auth/register',
       data: request.toJson(),
     );
 
-    final authResponse = AuthResponse.fromJson(response.data);
+    final dynamic respData = response.data;
+    final Map<String, dynamic> authData =
+        (respData is Map && respData.containsKey('data'))
+            ? respData['data']
+            : respData;
+
+    final authResponse = AuthResponse.fromJson(authData);
 
     // Save token and user data
     await _storageService.saveToken(authResponse.token);
@@ -48,12 +58,17 @@ class AuthRepository {
 
   // Get current user from API
   Future<User> getCurrentUser() async {
-    final response = await _apiService.get('/auth/me');
+    final response = await _apiService.get('auth/me');
+    final dynamic respData = response.data;
+    final Map<String, dynamic> userJson =
+        (respData is Map && respData.containsKey('data'))
+            ? respData['data']
+            : respData;
 
-    final userDto = UserDto.fromJson(response.data);
+    final userDto = UserDto.fromJson(userJson);
 
     // Update stored user data
-    await _storageService.saveUser(response.data);
+    await _storageService.saveUser(userJson);
 
     return userDto.toEntity();
   }

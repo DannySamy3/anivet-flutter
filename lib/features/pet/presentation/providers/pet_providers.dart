@@ -2,12 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:annivet/features/pet/data/repositories/pet_repository.dart';
 import 'package:annivet/features/pet/domain/entities/pet.dart';
 import 'package:annivet/core/constants/app_enums.dart';
-import 'package:annivet/core/services/api_service.dart';
-import 'package:annivet/core/services/storage_service.dart';
+import 'package:annivet/features/auth/presentation/providers/auth_providers.dart';
 
 // Repository provider
 final petRepositoryProvider = Provider<PetRepository>((ref) {
-  final apiService = ApiService(StorageService());
+  final apiService = ref.watch(apiServiceProvider);
   return PetRepository(apiService);
 });
 

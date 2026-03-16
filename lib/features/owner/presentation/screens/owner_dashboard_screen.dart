@@ -7,14 +7,17 @@ import 'package:annivet/features/auth/presentation/providers/auth_providers.dart
 import 'package:annivet/features/boarding/presentation/providers/boarding_providers.dart';
 import 'package:annivet/features/reminders/presentation/providers/reminder_providers.dart';
 import 'package:annivet/features/pet/presentation/providers/pet_providers.dart';
+import 'package:annivet/features/products/presentation/providers/product_providers.dart';
+import 'package:annivet/features/products/domain/entities/low_stock_product.dart';
+import 'package:annivet/features/reminders/domain/entities/reminder.dart';
 
 class OwnerDashboardScreen extends ConsumerWidget {
   const OwnerDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final remindersAsync = ref.watch(allRemindersProvider);
-    final boardingsAsync = ref.watch(allBoardingsProvider);
+    final upcomingRemindersAsync = ref.watch(upcomingRemindersProvider);
+    final lowStockProductsAsync = ref.watch(lowStockProductsProvider);
     final petsAsync = ref.watch(allPetsProvider);
     final user = ref.watch(currentUserProvider);
     final firstName = user?.name.split(' ').first ?? 'Doctor';
@@ -25,7 +28,8 @@ class OwnerDashboardScreen extends ConsumerWidget {
         color: AppColors.primaryGreen,
         onRefresh: () async {
           ref.invalidate(allBoardingsProvider);
-          ref.invalidate(allRemindersProvider);
+          ref.invalidate(upcomingRemindersProvider);
+          ref.invalidate(lowStockProductsProvider);
           ref.invalidate(allPetsProvider);
         },
         child: CustomScrollView(
@@ -44,16 +48,12 @@ class OwnerDashboardScreen extends ConsumerWidget {
                 ),
                 child: petsAsync.when(
                   data: (pets) {
-                    final pendingAlerts = remindersAsync.maybeWhen(
-                      data: (reminders) =>
-                          reminders.where((r) => !r.sent).length,
+                    final remindersCount = upcomingRemindersAsync.maybeWhen(
+                      data: (reminders) => reminders.length,
                       orElse: () => 0,
                     );
-                    final activeCases = boardingsAsync.maybeWhen(
-                      data: (boardings) => boardings
-                          .where((b) =>
-                              b.status == 'ACTIVE' || b.status == 'APPROVED')
-                          .length,
+                    final stockAlertsCount = lowStockProductsAsync.maybeWhen(
+                      data: (products) => products.length,
                       orElse: () => 0,
                     );
 
@@ -82,76 +82,19 @@ class OwnerDashboardScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 24),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Text(
-                                    '${pets.length}',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Patients',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 11,
-                                      color: Colors.white.withOpacity(0.7),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            _HeaderMetric(
+                              value: '${pets.length}',
+                              label: 'Patients',
                             ),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Text(
-                                    '$activeCases',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Active Cases',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 11,
-                                      color: Colors.white.withOpacity(0.7),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            _HeaderMetric(
+                              value: '$stockAlertsCount',
+                              label: 'Stock Alert',
                             ),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Text(
-                                    '$pendingAlerts',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    'Alerts',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 11,
-                                      color: Colors.white.withOpacity(0.7),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            _HeaderMetric(
+                              value: '$remindersCount',
+                              label: 'Reminders',
                             ),
                           ],
                         ),
@@ -220,61 +163,60 @@ class OwnerDashboardScreen extends ConsumerWidget {
                         'Quick Actions',
                         style: GoogleFonts.poppins(
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w700,
                           color: AppColors.primaryBlue,
+                          letterSpacing: -0.3,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      GridView.count(
-                        crossAxisCount: 3,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        mainAxisSpacing: 8,
-                        crossAxisSpacing: 10,
-                        childAspectRatio: 1.1,
-                        children: [
-                          _QuickActionCard(
-                            icon: Icons.calendar_today_rounded,
-                            label: 'Schedule',
-                            color: const Color(0xFF1976D2),
-                            onTap: () => context.go('/owner/boarding'),
-                          ),
-                          _QuickActionCard(
-                            icon: Icons.assignment_rounded,
-                            label: 'Records',
-                            color: const Color(0xFFF57C00),
-                            onTap: () => context.go('/owner/medical-records'),
-                          ),
-                          _QuickActionCard(
-                            icon: Icons.notifications_rounded,
-                            label: 'Reminders',
-                            color: AppColors.primaryGreen,
-                            onTap: () => context.go('/owner/reminders'),
-                          ),
-                          _QuickActionCard(
-                            icon: Icons.pets_rounded,
-                            label: 'Patients',
-                            color: const Color(0xFF7B1FA2),
-                            onTap: () => context.go('/owner/pet'),
-                          ),
-                          _QuickActionCard(
-                            icon: Icons.trending_up_rounded,
-                            label: 'Analytics',
-                            color: const Color(0xFF00796B),
-                            onTap: () {},
-                          ),
-                          _QuickActionCard(
-                            icon: Icons.settings_rounded,
-                            label: 'Settings',
-                            color: const Color(0xFF455A64),
-                            onTap: () => context.go('/owner/more'),
-                          ),
-                        ],
+                      const SizedBox(height: 16),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Row(
+                          children: [
+                            _QuickActionCard(
+                              icon: Icons.calendar_today_rounded,
+                              label: 'Schedule',
+                              color: const Color(0xFF1976D2),
+                              onTap: () => context.go('/owner/boarding'),
+                            ),
+                            _QuickActionCard(
+                              icon: Icons.assignment_rounded,
+                              label: 'Records',
+                              color: const Color(0xFFF57C00),
+                              onTap: () => context.go('/owner/medical-records'),
+                            ),
+                            _QuickActionCard(
+                              icon: Icons.notifications_rounded,
+                              label: 'Reminders',
+                              color: AppColors.primaryGreen,
+                              onTap: () => context.go('/owner/reminders'),
+                            ),
+                            _QuickActionCard(
+                              icon: Icons.pets_rounded,
+                              label: 'Patients',
+                              color: const Color(0xFF7B1FA2),
+                              onTap: () => context.go('/owner/pet'),
+                            ),
+                            _QuickActionCard(
+                              icon: Icons.trending_up_rounded,
+                              label: 'Analytics',
+                              color: const Color(0xFF00796B),
+                              onTap: () {},
+                            ),
+                            _QuickActionCard(
+                              icon: Icons.settings_rounded,
+                              label: 'Settings',
+                              color: const Color(0xFF455A64),
+                              onTap: () => context.go('/owner/more'),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   // Health Alerts - Critical Section
                   Column(
@@ -283,60 +225,50 @@ class OwnerDashboardScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color:
-                                      const Color(0xFFE53935).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.warning_amber_rounded,
-                                  color: Color(0xFFE53935),
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                'Health Alerts',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.primaryBlue,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            'Reminders',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryBlue,
+                              letterSpacing: -0.3,
+                            ),
                           ),
-                          TextButton(
-                            onPressed: () => context.go('/owner/reminders'),
+                          GestureDetector(
+                            onTap: () => context.go('/owner/reminders'),
                             child: Text(
                               'View all',
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 color: AppColors.primaryGreen,
                                 fontWeight: FontWeight.w600,
+                                letterSpacing: 0.1,
                               ),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 12),
-                      remindersAsync.when(
+                      upcomingRemindersAsync.when(
                         data: (reminders) {
-                          final pendingReminders =
-                              reminders.where((r) => !r.sent).take(6).toList();
-                          if (pendingReminders.isEmpty) {
+                          if (reminders.isEmpty) {
                             return _EmptyCard(
-                              message: '✓ All patients are up to date',
+                              message: '✓ No upcoming reminders',
                               icon: Icons.check_circle_outline,
                               bgColor:
                                   const Color(0xFF4CAF50).withOpacity(0.08),
                             );
                           }
+                          final uniqueReminders = <String, Reminder>{};
+                          for (final r in reminders) {
+                            uniqueReminders[r.id] = r;
+                          }
+                          final sortedReminders = uniqueReminders.values.toList()
+                            ..sort((a, b) => a.dueDate.compareTo(b.dueDate));
+
                           return Column(
-                            children: pendingReminders
+                            children: sortedReminders
+                                .take(3)
                                 .map((r) => _HealthAlertCard(reminder: r))
                                 .toList(),
                           );
@@ -348,14 +280,14 @@ class OwnerDashboardScreen extends ConsumerWidget {
                               color: AppColors.primaryGreen),
                         )),
                         error: (err, _) => _EmptyCard(
-                          message: 'Could not load health alerts',
+                          message: 'Could not load reminders',
                           icon: Icons.error_outline,
                         ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 32),
 
                   // Active Consultations - Patient Care Focus
                   Column(
@@ -364,65 +296,55 @@ class OwnerDashboardScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color:
-                                      const Color(0xFF2196F3).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Icon(
-                                  Icons.medical_services_rounded,
-                                  color: Color(0xFF2196F3),
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                'Active Cases',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.primaryBlue,
-                                ),
-                              ),
-                            ],
+                          Text(
+                            'Stock Alert',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primaryBlue,
+                              letterSpacing: -0.3,
+                            ),
                           ),
-                          TextButton(
-                            onPressed: () => context.go('/owner/boarding'),
+                          GestureDetector(
+                            onTap: () => context.go('/owner/boarding'),
                             child: Text(
                               'View all',
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 color: AppColors.primaryGreen,
                                 fontWeight: FontWeight.w600,
+                                letterSpacing: 0.1,
                               ),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 12),
-                      boardingsAsync.when(
-                        data: (boardings) {
-                          final activeCases = boardings
-                              .where((b) =>
-                                  b.status == 'ACTIVE' ||
-                                  b.status == 'APPROVED')
-                              .take(5)
-                              .toList();
-                          if (activeCases.isEmpty) {
+                      lowStockProductsAsync.when(
+                        data: (products) {
+                          if (products.isEmpty) {
                             return _EmptyCard(
-                              message: 'No active cases at the moment',
-                              icon: Icons.medical_services_outlined,
+                              message: 'No stock alerts at the moment',
+                              icon: Icons.inventory_2_outlined,
                               bgColor:
                                   const Color(0xFF2196F3).withOpacity(0.08),
                             );
                           }
+                          final sortedProducts = List<LowStockProduct>.from(products)
+                            ..sort((a, b) {
+                              final urgencyOrder = {
+                                'CRITICAL': 0,
+                                'HIGH': 1,
+                                'MEDIUM': 2
+                              };
+                              return (urgencyOrder[a.urgency] ?? 3)
+                                  .compareTo(urgencyOrder[b.urgency] ?? 3);
+                            });
+
                           return Column(
-                            children: activeCases
-                                .map((b) => _AppointmentCard(boarding: b))
+                            children: sortedProducts
+                                .take(3)
+                                .map((p) => _StockAlertCard(product: p))
                                 .toList(),
                           );
                         },
@@ -433,7 +355,7 @@ class OwnerDashboardScreen extends ConsumerWidget {
                               color: AppColors.primaryGreen),
                         )),
                         error: (err, _) => _EmptyCard(
-                          message: 'Could not load cases',
+                          message: 'Error: $err',
                           icon: Icons.error_outline,
                         ),
                       ),
@@ -471,38 +393,37 @@ class _QuickActionCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.1),
-              blurRadius: 6,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
+        width: 72,
+        margin: const EdgeInsets.only(right: 16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              width: 54,
+              height: 54,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.12),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
-              child: Icon(icon, color: color, size: 20),
+              child: Icon(icon, color: color, size: 24),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Text(
               label,
               style: GoogleFonts.poppins(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
-                color: AppColors.primaryBlue,
+                color: AppColors.primaryBlue.withOpacity(0.8),
               ),
               textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -525,114 +446,121 @@ class _EmptyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
       decoration: BoxDecoration(
-        color: bgColor ?? Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: (bgColor ?? Colors.white).withOpacity(0.5),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: (bgColor ?? AppColors.textHint).withOpacity(0.1),
+        ),
       ),
-      child: Center(
-        child: Column(
-          children: [
-            Icon(icon,
-                size: 36,
-                color: bgColor != null
-                    ? Colors.black.withOpacity(0.3)
-                    : AppColors.textHint),
-            const SizedBox(height: 8),
-            Text(
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: (bgColor ?? AppColors.textHint).withOpacity(0.5)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
               message,
               style: GoogleFonts.poppins(
-                  color: AppColors.textSecondary, fontSize: 13),
-              textAlign: TextAlign.center,
+                color: AppColors.textSecondary.withOpacity(0.7),
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _AppointmentCard extends StatelessWidget {
-  final dynamic boarding;
+class _StockAlertCard extends StatelessWidget {
+  final LowStockProduct product;
 
-  const _AppointmentCard({required this.boarding});
+  const _StockAlertCard({required this.product});
 
   @override
   Widget build(BuildContext context) {
-    final status = (boarding.status ?? '').toString().toUpperCase();
-    final statusColor = _appointmentStatusColor(status);
-    final consultationId = 'Case #${boarding.id.toString().substring(0, 8)}';
-    final checkIn = boarding.checkIn as DateTime?;
-    final dateLabel = checkIn != null
-        ? '${checkIn.day}/${checkIn.month}/${checkIn.year}'
-        : 'No date';
+    final urgencyColor = _urgencyColor(product.urgency);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 6,
-              offset: const Offset(0, 2)),
-        ],
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.black.withOpacity(0.04)),
       ),
-      child: ListTile(
-        leading: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: statusColor.withOpacity(0.1),
-            shape: BoxShape.circle,
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: urgencyColor.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.inventory_2_rounded, color: urgencyColor, size: 19),
           ),
-          child: Icon(Icons.medical_services_rounded,
-              color: statusColor, size: 20),
-        ),
-        title: Text(
-          consultationId,
-          style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          dateLabel,
-          style:
-              GoogleFonts.poppins(fontSize: 11, color: AppColors.textSecondary),
-        ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: statusColor.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            status,
-            style: GoogleFonts.poppins(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: statusColor,
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  product.name,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryBlue,
+                  ),
+                ),
+                Text(
+                  '${product.stock} units left',
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: urgencyColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              product.urgency,
+              style: GoogleFonts.poppins(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: urgencyColor,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Color _appointmentStatusColor(String status) {
-    switch (status) {
-      case 'ACTIVE':
-        return const Color(0xFF4CAF50);
-      case 'APPROVED':
-        return const Color(0xFF2196F3);
-      case 'COMPLETED':
-        return const Color(0xFF9C27B0);
-      case 'CANCELLED':
-        return const Color(0xFFF44336);
+  Color _urgencyColor(String urgency) {
+    switch (urgency) {
+      case 'CRITICAL':
+        return const Color(0xFFE53935);
+      case 'HIGH':
+        return const Color(0xFFFB8C00);
+      case 'MEDIUM':
+        return const Color(0xFFFDD835);
       default:
-        return const Color(0xFFFFA726);
+        return AppColors.textHint;
     }
   }
 }
+
 
 class _HealthAlertCard extends StatelessWidget {
   final dynamic reminder;
@@ -650,54 +578,67 @@ class _HealthAlertCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: alertColor.withOpacity(0.2),
-          width: 1,
+          color: alertColor.withOpacity(0.08),
+          width: 0.8,
         ),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 6,
-              offset: const Offset(0, 2)),
-        ],
       ),
-      child: ListTile(
-        leading: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: alertColor.withOpacity(0.15),
-            shape: BoxShape.circle,
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: alertColor.withOpacity(0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(_alertIcon(reminderType), color: alertColor, size: 19),
           ),
-          child: Icon(_alertIcon(reminderType), color: alertColor, size: 20),
-        ),
-        title: Text(
-          reminder.message,
-          style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600),
-        ),
-        subtitle: Text(
-          'Due: $dateLabel',
-          style:
-              GoogleFonts.poppins(fontSize: 11, color: AppColors.textSecondary),
-        ),
-        trailing: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: alertColor.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text(
-            reminderType,
-            style: GoogleFonts.poppins(
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: alertColor,
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  reminder.message,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryBlue,
+                  ),
+                ),
+                Text(
+                  'Due: $dateLabel',
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: alertColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              reminderType,
+              style: GoogleFonts.poppins(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: alertColor,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -730,5 +671,37 @@ class _HealthAlertCard extends StatelessWidget {
       default:
         return Icons.notification_important_rounded;
     }
+  }
+}
+
+class _HeaderMetric extends StatelessWidget {
+  final String value;
+  final String label;
+
+  const _HeaderMetric({required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 11,
+            color: Colors.white.withOpacity(0.6),
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
   }
 }

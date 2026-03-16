@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:annivet/features/products/data/repositories/product_repository.dart';
 import 'package:annivet/features/products/domain/entities/product.dart';
-import 'package:annivet/core/services/api_service.dart';
-import 'package:annivet/core/services/storage_service.dart';
+import 'package:annivet/features/products/domain/entities/low_stock_product.dart';
+import 'package:annivet/features/auth/presentation/providers/auth_providers.dart';
 
 final productRepositoryProvider = Provider<ProductRepository>((ref) {
-  final apiService = ApiService(StorageService());
+  final apiService = ref.watch(apiServiceProvider);
   return ProductRepository(apiService);
 });
 
@@ -14,6 +14,12 @@ final productRepositoryProvider = Provider<ProductRepository>((ref) {
 final allProductsProvider = FutureProvider<List<Product>>((ref) async {
   final repository = ref.watch(productRepositoryProvider);
   return repository.getProducts();
+});
+
+final lowStockProductsProvider =
+    FutureProvider<List<LowStockProduct>>((ref) async {
+  final repository = ref.watch(productRepositoryProvider);
+  return repository.getLowStockProducts();
 });
 
 final productDetailProvider =

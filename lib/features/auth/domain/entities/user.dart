@@ -6,6 +6,7 @@ class User {
   final String name;
   final String? phone;
   final UserRole role;
+  final String? clinicId;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -15,6 +16,7 @@ class User {
     required this.name,
     this.phone,
     required this.role,
+    this.clinicId,
     required this.createdAt,
     this.updatedAt,
   });
@@ -25,6 +27,7 @@ class User {
     String? name,
     String? phone,
     UserRole? role,
+    String? clinicId,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -34,6 +37,7 @@ class User {
       name: name ?? this.name,
       phone: phone ?? this.phone,
       role: role ?? this.role,
+      clinicId: clinicId ?? this.clinicId,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -46,6 +50,7 @@ class User {
       'name': name,
       'phone': phone,
       'role': role.value,
+      'clinicId': clinicId,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };

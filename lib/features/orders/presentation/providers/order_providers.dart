@@ -1,11 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:annivet/features/orders/data/repositories/order_repository.dart';
 import 'package:annivet/features/orders/domain/entities/order.dart';
-import 'package:annivet/core/services/api_service.dart';
-import 'package:annivet/core/services/storage_service.dart';
+import 'package:annivet/features/auth/presentation/providers/auth_providers.dart';
 
 final orderRepositoryProvider = Provider<OrderRepository>((ref) {
-  final apiService = ApiService(StorageService());
+  final apiService = ref.watch(apiServiceProvider);
   return OrderRepository(apiService);
 });
 

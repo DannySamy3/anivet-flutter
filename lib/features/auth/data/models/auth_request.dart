@@ -42,9 +42,11 @@ class AuthResponse {
   const AuthResponse({required this.token, required this.user});
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
+    // API wraps payload in a "data" key: { success, message, data: { user, token } }
+    final payload = json['data'] as Map<String, dynamic>? ?? json;
     return AuthResponse(
-      token: json['token'] as String,
-      user: json['user'] as Map<String, dynamic>,
+      token: payload['token'] as String,
+      user: payload['user'] as Map<String, dynamic>,
     );
   }
 }

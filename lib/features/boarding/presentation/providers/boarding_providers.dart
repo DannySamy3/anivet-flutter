@@ -1,11 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:annivet/features/boarding/data/repositories/boarding_repository.dart';
 import 'package:annivet/features/boarding/domain/entities/boarding.dart';
-import 'package:annivet/core/services/api_service.dart';
-import 'package:annivet/core/services/storage_service.dart';
+import 'package:annivet/features/auth/presentation/providers/auth_providers.dart';
 
 final boardingRepositoryProvider = Provider<BoardingRepository>((ref) {
-  final apiService = ApiService(StorageService());
+  final apiService = ref.watch(apiServiceProvider);
   return BoardingRepository(apiService);
 });
 

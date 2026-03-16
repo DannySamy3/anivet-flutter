@@ -1,6 +1,6 @@
 class AppConstants {
   // API Configuration
-  static const String apiBaseUrl = 'http://localhost:3000/api';
+  static const String apiBaseUrl = 'http://localhost:3000/api/';
   static const int apiTimeout = 30000; // 30 seconds
   
   // Storage Keys

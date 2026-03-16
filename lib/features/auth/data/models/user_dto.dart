@@ -7,6 +7,7 @@ class UserDto {
   final String name;
   final String? phone;
   final String role;
+  final String? clinicId;
   final String createdAt;
   final String? updatedAt;
 
@@ -16,6 +17,7 @@ class UserDto {
     required this.name,
     this.phone,
     required this.role,
+    this.clinicId,
     required this.createdAt,
     this.updatedAt,
   });
@@ -27,6 +29,7 @@ class UserDto {
       name: json['name'] as String,
       phone: json['phone'] as String?,
       role: json['role'] as String,
+      clinicId: json['clinicId'] as String?,
       createdAt:
           json['createdAt'] as String? ?? DateTime.now().toIso8601String(),
       updatedAt: json['updatedAt'] as String?,
@@ -40,6 +43,7 @@ class UserDto {
       'name': name,
       'phone': phone,
       'role': role,
+      'clinicId': clinicId,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };
@@ -52,6 +56,7 @@ class UserDto {
       name: name,
       phone: phone,
       role: UserRoleExtension.fromString(role),
+      clinicId: clinicId,
       createdAt: DateTime.parse(createdAt),
       updatedAt: updatedAt != null ? DateTime.parse(updatedAt!) : null,
     );

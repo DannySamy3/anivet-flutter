@@ -16,13 +16,25 @@ import 'package:annivet/features/settings/routes.dart';
 import 'package:annivet/features/reminders/routes.dart';
 import 'package:annivet/features/medical_records/routes.dart';
 import 'package:annivet/core/widgets/home_screen.dart';
+import 'package:annivet/core/widgets/owner_scaffold.dart';
 import 'package:annivet/features/products/presentation/screens/admin_products_screen.dart';
 import 'package:annivet/features/products/presentation/screens/product_form_screen.dart';
 import 'package:annivet/features/feed/presentation/screens/admin_feed_screen.dart';
 import 'package:annivet/features/feed/presentation/screens/feed_form_screen.dart';
 import 'package:annivet/features/boarding/presentation/screens/admin_boardings_screen.dart';
+import 'package:annivet/features/boarding/presentation/screens/boarding_detail_screen.dart';
 import 'package:annivet/features/boarding/presentation/screens/request_boarding_screen.dart';
 import 'package:annivet/features/orders/presentation/screens/admin_orders_screen.dart';
+import 'package:annivet/features/orders/presentation/screens/order_detail_screen.dart';
+import 'package:annivet/features/pet/presentation/screens/admin_pets_screen.dart';
+import 'package:annivet/features/medical_records/presentation/screens/medical_records_screen.dart';
+import 'package:annivet/features/medical_records/presentation/screens/medical_record_detail_screen.dart';
+import 'package:annivet/features/settings/presentation/screens/settings_screen.dart';
+import 'package:annivet/features/owner/presentation/screens/owner_dashboard_screen.dart';
+import 'package:annivet/features/owner/presentation/screens/clinic_management_screen.dart';
+import 'package:annivet/features/owner/presentation/screens/pricing_screen.dart';
+import 'package:annivet/features/owner/presentation/screens/owner_profile_screen.dart';
+import 'package:annivet/features/owner/presentation/screens/owner_more_screen.dart';
 
 class App extends ConsumerWidget {
   const App({super.key});
@@ -49,8 +61,10 @@ class App extends ConsumerWidget {
   }
 
   GoRouter _createRouter(WidgetRef ref) {
+    final notifier = RouterNotifier(ref);
     return GoRouter(
       initialLocation: '/login',
+      refreshListenable: notifier,
       redirect: (context, state) {
         final authState = ref.read(authStateProvider);
         final isAuthenticated = authState.user != null;
@@ -150,13 +164,131 @@ class App extends ConsumerWidget {
             ),
           ],
         ),
+
+        // ── OWNER role shell ────────────────────────────────────────────────
+        ShellRoute(
+          builder: (context, state, child) {
+            return OwnerScaffold(child: child);
+          },
+          routes: [
+            // Owner Dashboard
+            GoRoute(
+              path: '/owner/dashboard',
+              builder: (context, state) => const OwnerDashboardScreen(),
+            ),
+
+            // Clinic Management
+            GoRoute(
+              path: '/owner/clinic',
+              builder: (context, state) => const ClinicManagementScreen(),
+            ),
+
+            // Pricing (OWNER ONLY)
+            GoRoute(
+              path: '/owner/pricing',
+              builder: (context, state) => const PricingScreen(),
+            ),
+
+            // Owner Profile
+            GoRoute(
+              path: '/owner/profile',
+              builder: (context, state) => const OwnerProfileScreen(),
+            ),
+
+            // Owner More Options
+            GoRoute(
+              path: '/owner/more',
+              builder: (context, state) => const OwnerMoreScreen(),
+            ),
+
+            // Settings (reuse existing screen)
+            GoRoute(
+              path: '/owner/settings',
+              builder: (context, state) => const SettingsScreen(),
+            ),
+
+            // Boarding management
+            GoRoute(
+              path: '/owner/boarding',
+              builder: (context, state) => const AdminBoardingsScreen(),
+            ),
+            GoRoute(
+              path: '/owner/boarding/:id',
+              builder: (context, state) {
+                final id = state.pathParameters['id']!;
+                return BoardingDetailScreen(boardingId: id);
+              },
+            ),
+
+            // Pets (all pets view)
+            GoRoute(
+              path: '/owner/pets',
+              builder: (context, state) => const AdminPetsScreen(),
+            ),
+
+            // Products & Inventory
+            GoRoute(
+              path: '/owner/products',
+              builder: (context, state) => const AdminProductsScreen(),
+            ),
+            GoRoute(
+              path: '/owner/products/new',
+              builder: (context, state) => const ProductFormScreen(),
+            ),
+            GoRoute(
+              path: '/owner/products/:id/edit',
+              builder: (context, state) {
+                final id = state.pathParameters['id']!;
+                return ProductFormScreen(productId: id);
+              },
+            ),
+
+            // Orders
+            GoRoute(
+              path: '/owner/orders',
+              builder: (context, state) => const AdminOrdersScreen(),
+            ),
+            GoRoute(
+              path: '/owner/orders/:id',
+              builder: (context, state) {
+                final id = state.pathParameters['id']!;
+                return OrderDetailScreen(orderId: id);
+              },
+            ),
+
+            // Medical Records
+            GoRoute(
+              path: '/owner/medical-records',
+              builder: (context, state) =>
+                  const MedicalRecordsScreen(petId: ''),
+            ),
+            GoRoute(
+              path: '/owner/medical-records/:id',
+              builder: (context, state) {
+                final id = state.pathParameters['id']!;
+                return MedicalRecordDetailScreen(recordId: id);
+              },
+            ),
+          ],
+        ),
       ],
     );
   }
 
   String _getHomeRouteForRole(UserRole role) {
-    // Both roles see the same home screen for now
-    return '/home';
+    switch (role) {
+      case UserRole.owner:
+        return '/owner/dashboard';
+      case UserRole.customer:
+        return '/home';
+    }
+  }
+}
+
+// Listens to auth state and notifies GoRouter to re-run redirect
+class RouterNotifier extends ChangeNotifier {
+  RouterNotifier(WidgetRef ref) {
+    ref.listen(authStateProvider, (_, __) => notifyListeners());
   }
 }
 

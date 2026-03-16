@@ -1,11 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:annivet/features/feed/data/repositories/feed_repository.dart';
 import 'package:annivet/features/feed/domain/entities/feed_post.dart';
-import 'package:annivet/core/services/api_service.dart';
-import 'package:annivet/core/services/storage_service.dart';
+import 'package:annivet/features/auth/presentation/providers/auth_providers.dart';
 
 final feedRepositoryProvider = Provider<FeedRepository>((ref) {
-  final apiService = ApiService(StorageService());
+  final apiService = ref.watch(apiServiceProvider);
   return FeedRepository(apiService);
 });
 

@@ -2,13 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:annivet/features/medical_records/data/repositories/medical_record_repository.dart';
 import 'package:annivet/features/medical_records/domain/entities/medical_record.dart';
 import 'package:annivet/features/medical_records/data/dtos/medical_record_dto.dart';
-import 'package:annivet/core/services/api_service.dart';
-import 'package:annivet/core/services/storage_service.dart';
+import 'package:annivet/features/auth/presentation/providers/auth_providers.dart';
 
 // Repository provider
 final medicalRecordRepositoryProvider =
     Provider<MedicalRecordRepository>((ref) {
-  final apiService = ApiService(StorageService());
+  final apiService = ref.watch(apiServiceProvider);
   return MedicalRecordRepository(apiService);
 });
 

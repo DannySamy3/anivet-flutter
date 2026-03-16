@@ -334,10 +334,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 const SizedBox(height: 10),
 
                                 // Sign In button
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 52,
-                                  child: DecoratedBox(
+                                GestureDetector(
+                                  onTap:
+                                      authState.isLoading ? null : _handleLogin,
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 52,
                                     decoration: BoxDecoration(
                                       gradient: const LinearGradient(
                                         colors: [
@@ -355,18 +357,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                         ),
                                       ],
                                     ),
-                                    child: ElevatedButton(
-                                      onPressed: authState.isLoading
-                                          ? null
-                                          : _handleLogin,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        shadowColor: Colors.transparent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(14),
-                                        ),
-                                      ),
+                                    child: Center(
                                       child: authState.isLoading
                                           ? const SizedBox(
                                               width: 22,
