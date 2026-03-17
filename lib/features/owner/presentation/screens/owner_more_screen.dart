@@ -151,9 +151,9 @@ class OwnerMoreScreen extends ConsumerWidget {
                   onTap: () => context.go('/owner/pricing'),
                 ),
                 _MenuItem(
-                  icon: Icons.people_outline_rounded,
-                  label: 'Customers',
-                  onTap: () => context.go('/owner/customers'),
+                  icon: Icons.receipt_long_rounded,
+                  label: 'Orders',
+                  onTap: () => context.go('/owner/orders'),
                 ),
                 const SizedBox(height: 24),
 
