@@ -181,10 +181,10 @@ class OwnerDashboardScreen extends ConsumerWidget {
                               onTap: () => context.go('/owner/boarding'),
                             ),
                             _QuickActionCard(
-                              icon: Icons.assignment_rounded,
-                              label: 'Records',
+                              icon: Icons.inventory_2_rounded,
+                              label: 'Inventory',
                               color: const Color(0xFFF57C00),
-                              onTap: () => context.go('/owner/medical-records'),
+                              onTap: () => context.go('/owner/products'),
                             ),
                             _QuickActionCard(
                               icon: Icons.notifications_rounded,
