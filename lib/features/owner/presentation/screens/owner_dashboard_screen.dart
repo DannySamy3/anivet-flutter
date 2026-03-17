@@ -222,31 +222,14 @@ class OwnerDashboardScreen extends ConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Reminders',
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryBlue,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => context.go('/owner/reminders'),
-                            child: Text(
-                              'View all',
-                              style: GoogleFonts.poppins(
-                                fontSize: 13,
-                                color: AppColors.primaryGreen,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.1,
-                              ),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        'Reminders',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryBlue.withOpacity(0.8),
+                          letterSpacing: -0.2,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       upcomingRemindersAsync.when(
@@ -293,31 +276,14 @@ class OwnerDashboardScreen extends ConsumerWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Stock Alert',
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryBlue,
-                              letterSpacing: -0.3,
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () => context.go('/owner/boarding'),
-                            child: Text(
-                              'View all',
-                              style: GoogleFonts.poppins(
-                                fontSize: 13,
-                                color: AppColors.primaryGreen,
-                                fontWeight: FontWeight.w600,
-                                letterSpacing: 0.1,
-                              ),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        'Stock Alert',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryBlue.withOpacity(0.8),
+                          letterSpacing: -0.2,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       lowStockProductsAsync.when(
@@ -530,15 +496,15 @@ class _StockAlertCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: urgencyColor.withOpacity(0.12),
+              color: urgencyColor.withOpacity(0.06),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               product.urgency,
               style: GoogleFonts.poppins(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                color: urgencyColor,
+                fontSize: 9,
+                fontWeight: FontWeight.w600,
+                color: urgencyColor.withOpacity(0.7),
               ),
             ),
           ),
@@ -626,15 +592,15 @@ class _HealthAlertCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: alertColor.withOpacity(0.1),
+              color: alertColor.withOpacity(0.06),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               reminderType,
               style: GoogleFonts.poppins(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                color: alertColor,
+                fontSize: 9,
+                fontWeight: FontWeight.w600,
+                color: alertColor.withOpacity(0.7),
               ),
             ),
           ),
