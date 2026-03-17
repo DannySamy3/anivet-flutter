@@ -106,21 +106,14 @@ class _CustomerDetailScaffold extends StatelessWidget {
   }
 
   Widget _buildContactSection() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.primaryBlue.withOpacity(0.03),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primaryBlue.withOpacity(0.05)),
-      ),
-      child: Column(
+    return Center(
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 20,
+        runSpacing: 8,
         children: [
           _ContactItem(icon: Icons.email_outlined, value: customer.email),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Divider(height: 1, color: AppColors.primaryBlue.withOpacity(0.05)),
-          ),
           _ContactItem(icon: Icons.phone_outlined, value: customer.phone),
         ],
       ),
@@ -164,17 +157,16 @@ class _ContactItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 16, color: AppColors.primaryBlue.withOpacity(0.5)),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            value,
-            style: GoogleFonts.poppins(
-              fontSize: 13,
-              color: AppColors.primaryBlue,
-              fontWeight: FontWeight.w500,
-            ),
+        Icon(icon, size: 14, color: AppColors.primaryBlue.withOpacity(0.5)),
+        const SizedBox(width: 8),
+        Text(
+          value,
+          style: GoogleFonts.poppins(
+            fontSize: 13,
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w400,
           ),
         ),
       ],
