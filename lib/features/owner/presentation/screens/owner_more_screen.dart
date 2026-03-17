@@ -120,16 +120,6 @@ class OwnerMoreScreen extends ConsumerWidget {
                   label: 'Profile',
                   onTap: () => context.go('/owner/profile'),
                 ),
-                _MenuItem(
-                  icon: Icons.security_rounded,
-                  label: 'Security & Privacy',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Security settings coming soon')),
-                    );
-                  },
-                ),
                 const SizedBox(height: 24),
 
                 // Management section
@@ -160,6 +150,11 @@ class OwnerMoreScreen extends ConsumerWidget {
                   label: 'Pricing Configuration',
                   onTap: () => context.go('/owner/pricing'),
                 ),
+                _MenuItem(
+                  icon: Icons.people_outline_rounded,
+                  label: 'Customers',
+                  onTap: () => context.go('/owner/customers'),
+                ),
                 const SizedBox(height: 24),
 
                 // Settings section
@@ -182,28 +177,7 @@ class OwnerMoreScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // Help & Support section
-                _MenuSectionTitle('Help & Support'),
                 const SizedBox(height: 8),
-                _MenuItem(
-                  icon: Icons.help_outline_rounded,
-                  label: 'Help Center',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Help center coming soon')),
-                    );
-                  },
-                ),
-                _MenuItem(
-                  icon: Icons.info_outline_rounded,
-                  label: 'About',
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('About page coming soon')),
-                    );
-                  },
-                ),
-                const SizedBox(height: 24),
 
                 // Logout
                 _MenuItem(

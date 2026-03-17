@@ -7,6 +7,7 @@ import 'package:annivet/core/theme/app_theme.dart';
 import 'package:annivet/features/auth/presentation/providers/auth_providers.dart';
 import 'package:annivet/features/auth/presentation/screens/login_screen.dart';
 import 'package:annivet/features/auth/presentation/screens/register_screen.dart';
+import 'package:annivet/features/auth/presentation/screens/splash_screen.dart';
 import 'package:annivet/features/pet/routes.dart';
 import 'package:annivet/features/products/routes.dart';
 import 'package:annivet/features/orders/routes.dart';
@@ -35,6 +36,8 @@ import 'package:annivet/features/owner/presentation/screens/clinic_management_sc
 import 'package:annivet/features/owner/presentation/screens/pricing_screen.dart';
 import 'package:annivet/features/owner/presentation/screens/owner_profile_screen.dart';
 import 'package:annivet/features/owner/presentation/screens/owner_more_screen.dart';
+import 'package:annivet/features/customers/presentation/screens/customer_detail_screen.dart';
+import 'package:annivet/features/owner/presentation/screens/customers_screen.dart';
 
 class App extends ConsumerWidget {
   const App({super.key});
@@ -63,13 +66,14 @@ class App extends ConsumerWidget {
   GoRouter _createRouter(WidgetRef ref) {
     final notifier = RouterNotifier(ref);
     return GoRouter(
-      initialLocation: '/login',
+      initialLocation: '/splash',
       refreshListenable: notifier,
       redirect: (context, state) {
         final authState = ref.read(authStateProvider);
         final isAuthenticated = authState.user != null;
         final isAuthRoute = state.matchedLocation == '/login' ||
-            state.matchedLocation == '/register';
+            state.matchedLocation == '/register' ||
+            state.matchedLocation == '/splash';
 
         // Redirect to login if not authenticated and trying to access protected route
         if (!isAuthenticated && !isAuthRoute) {
@@ -84,6 +88,11 @@ class App extends ConsumerWidget {
         return null; // No redirect needed
       },
       routes: [
+        // Splash screen
+        GoRoute(
+          path: '/splash',
+          builder: (context, state) => const SplashScreen(),
+        ),
         // Auth routes
         GoRoute(
           path: '/login',
@@ -199,6 +208,19 @@ class App extends ConsumerWidget {
             GoRoute(
               path: '/owner/more',
               builder: (context, state) => const OwnerMoreScreen(),
+            ),
+
+            // Customers Management
+            GoRoute(
+              path: '/owner/customers',
+              builder: (context, state) => const CustomersScreen(),
+            ),
+            GoRoute(
+              path: '/owner/customers/:id',
+              builder: (context, state) {
+                final id = state.pathParameters['id']!;
+                return CustomerDetailScreen(customerId: id);
+              },
             ),
 
             // Settings (reuse existing screen)

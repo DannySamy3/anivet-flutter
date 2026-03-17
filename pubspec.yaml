@@ -40,6 +40,9 @@ dependencies:
   
   # Icons
   cupertino_icons: ^1.0.6
+  
+  # Animations
+  lottie: ^3.1.0
 
 dev_dependencies:
   flutter_test:
