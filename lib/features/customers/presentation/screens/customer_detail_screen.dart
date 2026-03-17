@@ -106,14 +106,19 @@ class _CustomerDetailScaffold extends StatelessWidget {
   }
 
   Widget _buildContactSection() {
-    return Center(
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 20,
-        runSpacing: 8,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.primaryBlue.withOpacity(0.03),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.primaryBlue.withOpacity(0.05)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ContactItem(icon: Icons.email_outlined, value: customer.email),
+          const SizedBox(height: 8),
           _ContactItem(icon: Icons.phone_outlined, value: customer.phone),
         ],
       ),
@@ -157,16 +162,18 @@ class _ContactItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: AppColors.primaryBlue.withOpacity(0.5)),
+        Icon(icon, size: 16, color: AppColors.primaryBlue.withOpacity(0.5)),
         const SizedBox(width: 8),
-        Text(
-          value,
-          style: GoogleFonts.poppins(
-            fontSize: 13,
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.w400,
+        Expanded(
+          child: Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: AppColors.primaryBlue,
+              fontWeight: FontWeight.w500,
+            ),
+            softWrap: true,
           ),
         ),
       ],
