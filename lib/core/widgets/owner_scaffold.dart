@@ -19,7 +19,7 @@ class _OwnerScaffoldState extends ConsumerState<OwnerScaffold> {
     _OwnerNavItem(
         path: '/owner/dashboard', icon: Icons.home_rounded, label: 'Home'),
     _OwnerNavItem(
-        path: '/owner/boarding', icon: Icons.hotel_rounded, label: 'Boarding'),
+        path: '/owner/feed', icon: Icons.campaign_rounded, label: 'Community'),
     _OwnerNavItem(
         path: '/owner/customers',
         icon: Icons.people_rounded,

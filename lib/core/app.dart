@@ -210,6 +210,12 @@ class App extends ConsumerWidget {
               builder: (context, state) => const OwnerMoreScreen(),
             ),
 
+            // Community Feed
+            GoRoute(
+              path: '/owner/feed',
+              builder: (context, state) => const AdminFeedScreen(),
+            ),
+
             // Customers Management
             GoRoute(
               path: '/owner/customers',

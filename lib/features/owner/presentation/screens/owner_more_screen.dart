@@ -131,6 +131,11 @@ class OwnerMoreScreen extends ConsumerWidget {
                   onTap: () => context.go('/owner/clinic'),
                 ),
                 _MenuItem(
+                  icon: Icons.hotel_rounded,
+                  label: 'Boarding',
+                  onTap: () => context.go('/owner/boarding'),
+                ),
+                _MenuItem(
                   icon: Icons.pets_rounded,
                   label: 'My Pets',
                   onTap: () => context.go('/owner/pets'),
