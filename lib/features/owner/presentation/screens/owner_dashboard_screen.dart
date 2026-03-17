@@ -175,10 +175,10 @@ class OwnerDashboardScreen extends ConsumerWidget {
                         child: Row(
                           children: [
                             _QuickActionCard(
-                              icon: Icons.calendar_today_rounded,
-                              label: 'Schedule',
-                              color: const Color(0xFF1976D2),
-                              onTap: () => context.go('/owner/boarding'),
+                              icon: Icons.pets_rounded,
+                              label: 'Pets',
+                              color: const Color(0xFF7B1FA2),
+                              onTap: () => context.go('/owner/pets'),
                             ),
                             _QuickActionCard(
                               icon: Icons.inventory_2_rounded,
@@ -193,10 +193,10 @@ class OwnerDashboardScreen extends ConsumerWidget {
                               onTap: () => context.go('/owner/reminders'),
                             ),
                             _QuickActionCard(
-                              icon: Icons.pets_rounded,
-                              label: 'Pets',
-                              color: const Color(0xFF7B1FA2),
-                              onTap: () => context.go('/owner/pets'),
+                              icon: Icons.calendar_today_rounded,
+                              label: 'Schedule',
+                              color: const Color(0xFF1976D2),
+                              onTap: () => context.go('/owner/boarding'),
                             ),
                             _QuickActionCard(
                               icon: Icons.trending_up_rounded,
@@ -208,7 +208,7 @@ class OwnerDashboardScreen extends ConsumerWidget {
                               icon: Icons.settings_rounded,
                               label: 'Settings',
                               color: const Color(0xFF455A64),
-                              onTap: () => context.go('/owner/more'),
+                              onTap: () => context.go('/owner/settings'),
                             ),
                           ],
                         ),
