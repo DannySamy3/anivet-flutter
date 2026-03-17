@@ -86,7 +86,7 @@ class OwnerDashboardScreen extends ConsumerWidget {
                           children: [
                             _HeaderMetric(
                               value: '${pets.length}',
-                              label: 'Patients',
+                              label: 'Pets',
                             ),
                             _HeaderMetric(
                               value: '$stockAlertsCount',
@@ -194,9 +194,9 @@ class OwnerDashboardScreen extends ConsumerWidget {
                             ),
                             _QuickActionCard(
                               icon: Icons.pets_rounded,
-                              label: 'Patients',
+                              label: 'Pets',
                               color: const Color(0xFF7B1FA2),
-                              onTap: () => context.go('/owner/pet'),
+                              onTap: () => context.go('/owner/pets'),
                             ),
                             _QuickActionCard(
                               icon: Icons.trending_up_rounded,
