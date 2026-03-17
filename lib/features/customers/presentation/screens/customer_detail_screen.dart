@@ -108,18 +108,17 @@ class _CustomerDetailScaffold extends StatelessWidget {
   Widget _buildContactSection() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.primaryBlue.withOpacity(0.03),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.primaryBlue.withOpacity(0.05)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          _ContactItem(icon: Icons.email_outlined, value: customer.email),
-          const SizedBox(height: 8),
-          _ContactItem(icon: Icons.phone_outlined, value: customer.phone),
+          _ContactItem(icon: Icons.email_outlined, value: customer.email, flex: 3),
+          Container(height: 16, width: 1, color: AppColors.primaryBlue.withOpacity(0.1), margin: const EdgeInsets.symmetric(horizontal: 8)),
+          _ContactItem(icon: Icons.phone_outlined, value: customer.phone, flex: 2),
         ],
       ),
     );
@@ -156,27 +155,32 @@ class _CustomerDetailScaffold extends StatelessWidget {
 class _ContactItem extends StatelessWidget {
   final IconData icon;
   final String value;
+  final int flex;
 
-  const _ContactItem({required this.icon, required this.value});
+  const _ContactItem({required this.icon, required this.value, required this.flex});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: AppColors.primaryBlue.withOpacity(0.5)),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            value,
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: AppColors.primaryBlue,
-              fontWeight: FontWeight.w500,
+    return Expanded(
+      flex: flex,
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: AppColors.primaryBlue.withOpacity(0.5)),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              value,
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                color: AppColors.primaryBlue,
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.visible,
             ),
-            softWrap: true,
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
