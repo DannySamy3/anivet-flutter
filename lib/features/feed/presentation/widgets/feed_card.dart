@@ -24,23 +24,26 @@ class FeedCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (post.imageUrl != null)
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
-                child: CachedNetworkImage(
-                  imageUrl: post.imageUrl!,
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
+              Hero(
+                tag: 'feed_image_${post.id}',
+                child: ClipRRect(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(12)),
+                  child: CachedNetworkImage(
+                    imageUrl: post.imageUrl!,
+                    width: double.infinity,
                     height: 200,
-                    color: AppColors.surfaceVariant,
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    height: 200,
-                    color: AppColors.surfaceVariant,
-                    child: const Icon(Icons.image, size: 40),
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      height: 200,
+                      color: AppColors.surfaceVariant,
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      height: 200,
+                      color: AppColors.surfaceVariant,
+                      child: const Icon(Icons.image, size: 40),
+                    ),
                   ),
                 ),
               ),

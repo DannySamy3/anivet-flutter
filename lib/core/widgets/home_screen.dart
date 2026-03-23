@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:annivet/core/constants/app_colors.dart';
 import 'package:annivet/features/auth/presentation/providers/auth_providers.dart';
+import 'package:annivet/features/feed/presentation/providers/feed_providers.dart';
+import 'package:annivet/features/feed/presentation/widgets/feed_card.dart';
+import 'package:annivet/features/feed/domain/entities/feed_post.dart';
+import 'package:annivet/core/widgets/loading_indicator.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +24,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   late Animation<Offset> _headerSlide;
   late Animation<double> _cardsFade;
   late Animation<Offset> _cardsSlide;
+  final ScrollController _scrollController = ScrollController();
+  bool _isCollapsed = false;
 
   @override
   void initState() {
@@ -47,12 +53,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) _cardsController.forward();
     });
+
+    _scrollController.addListener(() {
+      final isCollapsed = _scrollController.hasClients &&
+          _scrollController.offset > (170 - kToolbarHeight);
+      if (isCollapsed != _isCollapsed) {
+        setState(() {
+          _isCollapsed = isCollapsed;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     _headerController.dispose();
     _cardsController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -65,94 +82,123 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF7F8FA),
       body: CustomScrollView(
+        controller: _scrollController,
         physics: const BouncingScrollPhysics(),
         slivers: [
-          // Gradient Header
-          SliverToBoxAdapter(
-            child: SlideTransition(
-              position: _headerSlide,
-              child: FadeTransition(
-                opacity: _headerFade,
+          // Sticky Gradient Header
+          SliverAppBar(
+            pinned: true,
+            expandedHeight: 170,
+            automaticallyImplyLeading: false,
+            backgroundColor: const Color(0xFFF7F8FA),
+            elevation: _isCollapsed ? 1 : 0,
+            centerTitle: true,
+            title: _isCollapsed
+                ? Text(
+                    'NEWS FEED',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primaryBlue,
+                      letterSpacing: 1.2,
+                    ),
+                  )
+                : null,
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 16),
                 child: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFFC2185B), Color(0xFF1A3558)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(36),
-                      bottomRight: Radius.circular(36),
-                    ),
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: _isCollapsed
+                        ? Colors.black.withOpacity(0.05)
+                        : Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
                   ),
-                  child: SafeArea(
-                    bottom: false,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Hello, $firstName! 🐾',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.white,
+                  child: Icon(
+                    Icons.notifications_outlined,
+                    color: _isCollapsed ? AppColors.primaryBlue : Colors.white,
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              background: SlideTransition(
+                position: _headerSlide,
+                child: FadeTransition(
+                  opacity: _headerFade,
+                  child: Container(
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFFC2185B), Color(0xFF1A3558)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                    child: SafeArea(
+                      bottom: false,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Hello, $firstName! 🐾',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 2),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      'Keep your pets healthy & happy',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 13,
+                                        color: Colors.white.withOpacity(0.85),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                // Bell removed here because it's now in the actions
+                                const SizedBox(width: 48),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            // Search bar
+                            Container(
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.95),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Row(
+                                children: [
+                                  const SizedBox(width: 14),
+                                  Icon(Icons.search,
+                                      color: AppColors.textSecondary,
+                                      size: 20),
+                                  const SizedBox(width: 10),
                                   Text(
-                                    'Keep your pets healthy & happy',
+                                    'Search services, products...',
                                     style: GoogleFonts.poppins(
                                       fontSize: 13,
-                                      color: Colors.white.withOpacity(0.85),
+                                      color: AppColors.textSecondary,
                                     ),
                                   ),
                                 ],
                               ),
-                              Container(
-                                width: 48,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: const Icon(Icons.notifications_outlined,
-                                    color: Colors.white, size: 24),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-                          // Search bar
-                          Container(
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.95),
-                              borderRadius: BorderRadius.circular(14),
                             ),
-                            child: Row(
-                              children: [
-                                const SizedBox(width: 14),
-                                Icon(Icons.search,
-                                    color: AppColors.textSecondary, size: 20),
-                                const SizedBox(width: 10),
-                                Text(
-                                  'Search services, products...',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 13,
-                                    color: AppColors.textSecondary,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -171,40 +217,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Quick Actions
-                      _sectionTitle('Quick Actions'),
                       const SizedBox(height: 14),
-                      GridView.count(
-                        crossAxisCount: 4,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 0.78,
-                        children: [
-                          _QuickAction(
-                              icon: Icons.pets,
-                              label: 'My Pets',
-                              color: const Color(0xFF5C6BC0),
-                              onTap: () => context.push('/pets')),
-                          _QuickAction(
-                              icon: Icons.medical_services_outlined,
-                              label: 'Records',
-                              color: const Color(0xFF26A69A),
-                              onTap: () => context.push('/medical-records')),
-                          _QuickAction(
-                              icon: Icons.hotel_outlined,
-                              label: 'Boarding',
-                              color: const Color(0xFFF4511E),
-                              onTap: () => context.push('/boarding')),
-                          _QuickAction(
-                              icon: Icons.alarm_outlined,
-                              label: 'Reminders',
-                              color: const Color(0xFFFFB300),
-                              onTap: () => context.push('/reminders')),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
 
                       // Services banner
                       _sectionTitle('Our Services'),
@@ -252,32 +265,60 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                       const SizedBox(height: 24),
 
-                      // Pet care tips
-                      _sectionTitle('Pet Care Tips'),
-                      const SizedBox(height: 14),
-                      _TipCard(
-                        icon: Icons.water_drop_outlined,
-                        iconColor: const Color(0xFF29B6F6),
-                        title: 'Hydration Matters',
-                        body:
-                            'Ensure fresh water is always available. Dogs need ~30ml per kg of body weight daily.',
+                      // Clinic news feed
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _sectionTitle('Latest from Clinic'),
+                          TextButton(
+                            onPressed: () => context.push('/feed'),
+                            child: Text(
+                              'View All',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFFC2185B),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 12),
-                      _TipCard(
-                        icon: Icons.directions_run,
-                        iconColor: const Color(0xFFF4511E),
-                        title: 'Daily Exercise',
-                        body:
-                            'Regular walks and playtime keep pets physically and mentally healthy.',
-                      ),
-                      const SizedBox(height: 12),
-                      _TipCard(
-                        icon: Icons.vaccines_outlined,
-                        iconColor: const Color(0xFF26A69A),
-                        title: 'Stay Up-to-Date on Vaccines',
-                        body:
-                            'Annual checkups and vaccinations prevent serious diseases and extend your pet\'s lifespan.',
-                      ),
+                      const SizedBox(height: 8),
+                      ref.watch(feedPostsProvider).when(
+                            data: (posts) {
+                              final displayPosts =
+                                  posts.isEmpty ? _getDummyPosts() : posts;
+                              return Column(
+                                children: displayPosts
+                                    .take(3)
+                                    .map((post) => FeedCard(
+                                          post: post,
+                                          onTap: () =>
+                                              context.push('/feed/${post.id}'),
+                                        ))
+                                    .toList(),
+                              );
+                            },
+                            loading: () => const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: LoadingIndicator(),
+                              ),
+                            ),
+                            error: (error, _) {
+                              final dummyPosts = _getDummyPosts();
+                              return Column(
+                                children: dummyPosts
+                                    .take(3)
+                                    .map((post) => FeedCard(
+                                          post: post,
+                                          onTap: () =>
+                                              context.push('/feed/${post.id}'),
+                                        ))
+                                    .toList(),
+                              );
+                            },
+                          ),
                       const SizedBox(height: 100),
                     ],
                   ),
@@ -288,6 +329,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ],
       ),
     );
+  }
+
+  List<FeedPost> _getDummyPosts() {
+    return [
+      FeedPost(
+        id: '1',
+        title: 'New Clinic Hours! ⏰',
+        content:
+            'We are now open on Sundays from 9 AM to 1 PM for emergency checkups. Your pets\' health is our priority!',
+        imageUrl:
+            'https://images.unsplash.com/photo-1516733725897-1aa73b87c8e8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+        createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+        updatedAt: DateTime.now().subtract(const Duration(hours: 2)),
+      ),
+      FeedPost(
+        id: '2',
+        title: 'Vaccination Drive 💉',
+        content:
+            'Bring your pets for a free rabies vaccination drive this Saturday. Keep them protected and happy!',
+        imageUrl:
+            'https://images.unsplash.com/photo-1628009368231-7bb7cfcb0def?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+        createdAt: DateTime.now().subtract(const Duration(days: 1)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 1)),
+      ),
+      FeedPost(
+        id: '3',
+        title: 'Pet Care Workshop 🐾',
+        content:
+            'Join our upcoming workshop on grooming and basic first aid for your beloved animal companions.',
+        imageUrl:
+            'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+        createdAt: DateTime.now().subtract(const Duration(days: 3)),
+        updatedAt: DateTime.now().subtract(const Duration(days: 3)),
+      ),
+    ];
   }
 
   Widget _sectionTitle(String title) {
@@ -302,51 +378,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 }
 
-class _QuickAction extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _QuickAction(
-      {required this.icon,
-      required this.label,
-      required this.color,
-      required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Icon(icon, color: color, size: 28),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            style: GoogleFonts.poppins(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
-              height: 1.2,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _ServiceBanner extends StatelessWidget {
   final IconData icon;
@@ -415,65 +446,3 @@ class _ServiceBanner extends StatelessWidget {
   }
 }
 
-class _TipCard extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String body;
-
-  const _TipCard(
-      {required this.icon,
-      required this.iconColor,
-      required this.title,
-      required this.body});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4))
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: iconColor, size: 22),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title,
-                    style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary)),
-                const SizedBox(height: 4),
-                Text(body,
-                    style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                        height: 1.5)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

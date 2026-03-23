@@ -11,7 +11,9 @@ import 'package:annivet/features/auth/presentation/screens/splash_screen.dart';
 import 'package:annivet/features/pet/routes.dart';
 import 'package:annivet/features/products/routes.dart';
 import 'package:annivet/features/orders/routes.dart';
-import 'package:annivet/features/feed/routes.dart';
+import 'package:annivet/features/feed/presentation/screens/feed_list_screen.dart';
+import 'package:annivet/features/feed/presentation/screens/feed_detail_screen.dart';
+import 'package:annivet/features/more/presentation/screens/customer_more_screen.dart';
 import 'package:annivet/features/boarding/routes.dart';
 import 'package:annivet/features/settings/routes.dart';
 import 'package:annivet/features/reminders/routes.dart';
@@ -113,10 +115,17 @@ class App extends ConsumerWidget {
               path: '/home',
               builder: (context, state) => const HomeScreen(),
             ),
+            GoRoute(
+              path: '/more',
+              builder: (context, state) => const CustomerMoreScreen(),
+            ),
             ...petRoutes,
             ...productRoutes,
             ...orderRoutes,
-            ...feedRoutes,
+            GoRoute(
+              path: '/feed',
+              builder: (context, state) => const FeedListScreen(),
+            ),
             ...boardingRoutes,
             ...settingsRoutes,
             ...reminderRoutes,
@@ -172,6 +181,15 @@ class App extends ConsumerWidget {
               builder: (context, state) => const AdminOrdersScreen(),
             ),
           ],
+        ),
+
+        // Full-screen News Detail (outside shell to hide bottom nav)
+        GoRoute(
+          path: '/feed/:id',
+          builder: (context, state) {
+            final postId = state.pathParameters['id']!;
+            return FeedDetailScreen(postId: postId);
+          },
         ),
 
         // ── OWNER role shell ────────────────────────────────────────────────
@@ -337,8 +355,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
     _NavItem(path: '/home', icon: Icons.home, label: 'Home'),
     _NavItem(path: '/pets', icon: Icons.pets, label: 'Pets'),
     _NavItem(path: '/store', icon: Icons.store, label: 'Store'),
-    _NavItem(path: '/boarding', icon: Icons.hotel, label: 'Boarding'),
-    _NavItem(path: '/settings', icon: Icons.settings, label: 'Settings'),
+    _NavItem(path: '/more', icon: Icons.more_horiz, label: 'More'),
   ];
 
   @override
