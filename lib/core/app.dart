@@ -10,6 +10,7 @@ import 'package:annivet/features/auth/presentation/screens/register_screen.dart'
 import 'package:annivet/features/auth/presentation/screens/splash_screen.dart';
 import 'package:annivet/features/pet/routes.dart';
 import 'package:annivet/features/products/routes.dart';
+import 'package:annivet/features/store/routes.dart';
 import 'package:annivet/features/orders/routes.dart';
 import 'package:annivet/features/feed/presentation/screens/feed_list_screen.dart';
 import 'package:annivet/features/feed/presentation/screens/feed_detail_screen.dart';
@@ -121,6 +122,7 @@ class App extends ConsumerWidget {
             ),
             ...petRoutes,
             ...productRoutes,
+            ...storeRoutes,
             ...orderRoutes,
             GoRoute(
               path: '/feed',

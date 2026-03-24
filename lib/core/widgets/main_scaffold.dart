@@ -27,7 +27,7 @@ class _MainScaffoldState extends ConsumerState<MainScaffold> {
         context.go('/pets');
         break;
       case 2:
-        context.go('/products');
+        context.go('/store');
         break;
       case 3:
         context.go('/feed');

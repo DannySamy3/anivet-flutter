@@ -3,7 +3,7 @@ class ProductDto {
   final String name;
   final String description;
   final double price;
-  final String category;
+  final String? category;
   final int stock;
   final String? imageUrl;
   final DateTime createdAt;
@@ -14,7 +14,7 @@ class ProductDto {
     required this.name,
     required this.description,
     required this.price,
-    required this.category,
+    this.category,
     required this.stock,
     this.imageUrl,
     required this.createdAt,
@@ -27,9 +27,9 @@ class ProductDto {
       name: json['name'] as String,
       description: json['description'] as String,
       price: (json['price'] as num).toDouble(),
-      category: json['category'] as String,
+      category: json['category'] as String?,
       stock: json['stock'] as int,
-      imageUrl: json['imageUrl'] as String?,
+      imageUrl: json['photoUrl'] as String? ?? json['imageUrl'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
     );

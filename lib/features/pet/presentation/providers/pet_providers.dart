@@ -3,6 +3,7 @@ import 'package:annivet/features/pet/data/repositories/pet_repository.dart';
 import 'package:annivet/features/pet/domain/entities/pet.dart';
 import 'package:annivet/core/constants/app_enums.dart';
 import 'package:annivet/features/auth/presentation/providers/auth_providers.dart';
+import 'package:annivet/core/services/mock_data_service.dart';
 
 // Repository provider
 final petRepositoryProvider = Provider<PetRepository>((ref) {
@@ -14,21 +15,27 @@ final petRepositoryProvider = Provider<PetRepository>((ref) {
 
 /// Fetch my pets (for customers)
 final myPetsProvider = FutureProvider<List<Pet>>((ref) async {
-  final repository = ref.watch(petRepositoryProvider);
-  return repository.getPets();
+  // Using mock data for development
+  final mockPets = MockDataService.getMockPets();
+  return mockPets.map((dto) => dto.toEntity()).toList();
 });
 
 /// Fetch all pets (for admin)
 final allPetsProvider = FutureProvider<List<Pet>>((ref) async {
-  final repository = ref.watch(petRepositoryProvider);
-  return repository.getPets();
+  // Using mock data for development
+  final mockPets = MockDataService.getMockPets();
+  return mockPets.map((dto) => dto.toEntity()).toList();
 });
 
 /// Fetch pet by ID
 final petDetailProvider =
     FutureProvider.family<Pet, String>((ref, petId) async {
-  final repository = ref.watch(petRepositoryProvider);
-  return repository.getPetById(petId);
+  // Using mock data for development
+  final mockPet = MockDataService.getMockPetDetail(petId);
+  if (mockPet == null) {
+    throw Exception('Pet not found');
+  }
+  return mockPet.toEntity();
 });
 
 // ============ MUTATIONS ============

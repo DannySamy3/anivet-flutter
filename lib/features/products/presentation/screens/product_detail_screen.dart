@@ -118,7 +118,7 @@ class ProductDetailScreen extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
-                        product.category.toUpperCase(),
+                        (product.category ?? 'Uncategorized').toUpperCase(),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: AppColors.primaryBlue,
                               fontWeight: FontWeight.bold,

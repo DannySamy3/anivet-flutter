@@ -19,11 +19,11 @@ class _OwnerScaffoldState extends ConsumerState<OwnerScaffold> {
     _OwnerNavItem(
         path: '/owner/dashboard', icon: Icons.home_rounded, label: 'Home'),
     _OwnerNavItem(
-        path: '/owner/feed', icon: Icons.campaign_rounded, label: 'Community'),
+        path: '/owner/boarding', icon: Icons.hotel_rounded, label: 'Boarding'),
     _OwnerNavItem(
-        path: '/owner/customers',
-        icon: Icons.people_rounded,
-        label: 'Customers'),
+        path: '/owner/orders',
+        icon: Icons.receipt_long_rounded,
+        label: 'Orders'),
     _OwnerNavItem(
         path: '/owner/more', icon: Icons.more_horiz_rounded, label: 'More'),
   ];

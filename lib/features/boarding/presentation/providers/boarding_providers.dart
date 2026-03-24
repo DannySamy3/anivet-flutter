@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:annivet/features/boarding/data/repositories/boarding_repository.dart';
 import 'package:annivet/features/boarding/domain/entities/boarding.dart';
 import 'package:annivet/features/auth/presentation/providers/auth_providers.dart';
+import 'package:annivet/core/services/mock_data_service.dart';
 
 final boardingRepositoryProvider = Provider<BoardingRepository>((ref) {
   final apiService = ref.watch(apiServiceProvider);
@@ -12,21 +13,27 @@ final boardingRepositoryProvider = Provider<BoardingRepository>((ref) {
 
 /// Get my boardings (customer)
 final myBoardingsProvider = FutureProvider<List<Boarding>>((ref) async {
-  final repository = ref.watch(boardingRepositoryProvider);
-  return repository.getMyBoardings();
+  // Using mock data for development
+  final mockBoardings = MockDataService.getMockBoardings();
+  return mockBoardings.map((dto) => Boarding.fromDto(dto)).toList();
 });
 
 /// Get all boardings (admin)
 final allBoardingsProvider = FutureProvider<List<Boarding>>((ref) async {
-  final repository = ref.watch(boardingRepositoryProvider);
-  return repository.getAllBoardings();
+  // Using mock data for development
+  final mockBoardings = MockDataService.getMockBoardings();
+  return mockBoardings.map((dto) => Boarding.fromDto(dto)).toList();
 });
 
 /// Get boarding by ID
 final boardingDetailProvider = FutureProvider.family<Boarding, String>(
   (ref, boardingId) async {
-    final repository = ref.watch(boardingRepositoryProvider);
-    return repository.getBoardingById(boardingId);
+    // Using mock data for development
+    final mockBoarding = MockDataService.getMockBoardingDetail(boardingId);
+    if (mockBoarding == null) {
+      throw Exception('Boarding not found');
+    }
+    return Boarding.fromDto(mockBoarding);
   },
 );
 
@@ -34,16 +41,17 @@ final boardingDetailProvider = FutureProvider.family<Boarding, String>(
 final boardingBillingProvider =
     FutureProvider.family<Map<String, dynamic>, String>(
   (ref, boardingId) async {
-    final repository = ref.watch(boardingRepositoryProvider);
-    return repository.getBillingInfo(boardingId);
+    // Using mock data for development
+    return MockDataService.getMockBillingInfo(boardingId);
   },
 );
 
 /// Get boarding logs
 final boardingLogsProvider = FutureProvider.family<List<BoardingLog>, String>(
   (ref, boardingId) async {
-    final repository = ref.watch(boardingRepositoryProvider);
-    return repository.getBoardingLogs(boardingId);
+    // Using mock data for development
+    final mockLogs = MockDataService.getMockBoardingLogDtos(boardingId);
+    return mockLogs.map((dto) => BoardingLog.fromDto(dto)).toList();
   },
 );
 

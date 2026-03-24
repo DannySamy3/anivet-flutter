@@ -71,7 +71,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
             _priceController.text = product.price.toString();
             _stockController.text = product.stock.toString();
             _imageUrlController.text = product.imageUrl ?? '';
-            _selectedCategory = product.category;
+            _selectedCategory = product.category ?? 'food';
           }
           return _buildForm();
         },
