@@ -4,6 +4,9 @@ import 'package:annivet/features/store/domain/entities/product.dart';
 import 'package:annivet/features/auth/presentation/providers/auth_providers.dart';
 import 'package:annivet/core/services/mock_data_service.dart';
 
+// Search state provider
+final searchQueryProvider = StateProvider<String>((ref) => '');
+
 // Repository provider
 final storeRepositoryProvider = Provider<StoreRepository>((ref) {
   final apiService = ref.watch(apiServiceProvider);
@@ -57,6 +60,22 @@ final productByCategoryProvider =
             updatedAt: DateTime.parse(p['updatedAt'] as String),
           ))
       .toList();
+});
+
+/// Get filtered products based on search query
+final filteredProductsProvider = FutureProvider<List<Product>>((ref) async {
+  final products = await ref.watch(allProductsProvider.future);
+  final searchQuery = ref.watch(searchQueryProvider).toLowerCase();
+
+  if (searchQuery.isEmpty) {
+    return products;
+  }
+
+  return products.where((product) {
+    return product.name.toLowerCase().contains(searchQuery) ||
+        product.description.toLowerCase().contains(searchQuery) ||
+        (product.category?.toLowerCase().contains(searchQuery) ?? false);
+  }).toList();
 });
 
 /// Get product by ID

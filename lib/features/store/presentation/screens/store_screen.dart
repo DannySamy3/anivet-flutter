@@ -5,13 +5,15 @@ import 'package:annivet/features/store/presentation/providers/store_providers.da
 import 'package:annivet/core/widgets/app_error_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:annivet/features/store/domain/entities/product.dart';
+import 'package:annivet/core/constants/app_colors.dart';
 
 class StoreScreen extends ConsumerWidget {
   const StoreScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final productsAsync = ref.watch(allProductsProvider);
+    final filteredProductsAsync = ref.watch(filteredProductsProvider);
+    final searchQuery = ref.watch(searchQueryProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -20,7 +22,7 @@ class StoreScreen extends ConsumerWidget {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
       ),
-      body: productsAsync.when(
+      body: filteredProductsAsync.when(
         data: (products) {
           if (products.isEmpty) {
             return Center(
@@ -46,34 +48,80 @@ class StoreScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header section
+                // Header section with brand colors
                 Container(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.teal.shade600, Colors.teal.shade800],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
+                    color: AppColors.primaryBlue,
                   ),
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Available Products',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.shopping_bag_outlined,
+                            color: AppColors.brandOrange,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Shop Now',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineSmall
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                 ),
+                                Text(
+                                  '${products.length} products available',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.8),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${products.length} items available',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 14,
+                      const SizedBox(height: 16),
+                      // Search field
+                      TextField(
+                        onChanged: (value) => ref
+                            .read(searchQueryProvider.notifier)
+                            .state = value,
+                        decoration: InputDecoration(
+                          hintText: 'Search products...',
+                          hintStyle:
+                              TextStyle(color: Colors.grey[600], fontSize: 14),
+                          prefixIcon: const Icon(Icons.search,
+                              color: AppColors.brandOrange),
+                          suffixIcon: searchQuery.isNotEmpty
+                              ? GestureDetector(
+                                  onTap: () => ref
+                                      .read(searchQueryProvider.notifier)
+                                      .state = '',
+                                  child: const Icon(Icons.close,
+                                      color: AppColors.brandOrange),
+                                )
+                              : null,
+                          filled: true,
+                          fillColor: Colors.white,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
                         ),
+                        style: const TextStyle(fontSize: 14),
                       ),
                     ],
                   ),
