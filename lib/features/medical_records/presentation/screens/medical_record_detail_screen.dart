@@ -44,24 +44,82 @@ class MedicalRecordDetailScreen extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              // Record Type Badge
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryGreen.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  record.type.toUpperCase(),
-                  style: const TextStyle(
-                    color: AppColors.primaryGreen,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
+              // Header Section with Type Badge and Title
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _getTypeColor(record.type).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      record.type.toUpperCase(),
+                      style: TextStyle(
+                        color: _getTypeColor(record.type),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                  if (record.isOverdue)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.warning, size: 14, color: Colors.red),
+                          SizedBox(width: 4),
+                          Text(
+                            'OVERDUE',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else if (record.isDueSoon)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.info, size: 14, color: Colors.orange),
+                          SizedBox(width: 4),
+                          Text(
+                            'DUE SOON',
+                            style: TextStyle(
+                              color: Colors.orange,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(height: 16),
 
@@ -74,7 +132,22 @@ class MedicalRecordDetailScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
 
-              // Record Information Card
+              // Pet Information Section
+              _SectionTitle('Pet Information'),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: _InfoRow(
+                    label: 'Pet ID',
+                    value: record.petId,
+                    icon: Icons.pets,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Record Details Card
+              _SectionTitle('Record Details'),
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -83,65 +156,19 @@ class MedicalRecordDetailScreen extends ConsumerWidget {
                     children: [
                       _InfoRow(
                         label: 'Record Date',
-                        value:
-                            '${record.recordDate.year}-${record.recordDate.month.toString().padLeft(2, '0')}-${record.recordDate.day.toString().padLeft(2, '0')}',
+                        value: _formatDate(record.recordDate),
                         icon: Icons.calendar_today,
                       ),
                       if (record.dueDate != null) ...[
                         const Divider(height: 20),
                         _InfoRow(
                           label: 'Due Date',
-                          value:
-                              '${record.dueDate!.year}-${record.dueDate!.month.toString().padLeft(2, '0')}-${record.dueDate!.day.toString().padLeft(2, '0')}',
+                          value: _formatDate(record.dueDate!),
                           icon: Icons.event_note,
                           valueColor: record.isOverdue
                               ? Colors.red
                               : (record.isDueSoon ? Colors.orange : null),
                         ),
-                        if (record.isOverdue)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Text(
-                                'OVERDUE',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        if (record.isDueSoon && !record.isOverdue)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.orange.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Text(
-                                'DUE SOON',
-                                style: TextStyle(
-                                  color: Colors.orange,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
                       ],
                       if (record.veterinarian != null) ...[
                         const Divider(height: 20),
@@ -155,41 +182,33 @@ class MedicalRecordDetailScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
 
-              // Description
-              Text(
-                'Description',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 8),
+              // Description Section
+              _SectionTitle('Description'),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Colors.grey[100],
                   borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!),
                 ),
                 child: Text(
                   record.description,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
+
+              // Notes Section
               if (record.notes != null) ...[
-                const SizedBox(height: 24),
-                Text(
-                  'Notes',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 20),
+                _SectionTitle('Additional Notes'),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
+                    color: Colors.blue[50],
                     borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue[200]!),
                   ),
                   child: Text(
                     record.notes!,
@@ -197,6 +216,33 @@ class MedicalRecordDetailScreen extends ConsumerWidget {
                   ),
                 ),
               ],
+
+              // Record Metadata Section
+              const SizedBox(height: 20),
+              _SectionTitle('Record Information'),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _InfoRow(
+                        label: 'Created',
+                        value: _formatDateTime(record.createdAt),
+                        icon: Icons.add_circle_outline,
+                      ),
+                      if (record.updatedAt != null) ...[
+                        const Divider(height: 20),
+                        _InfoRow(
+                          label: 'Last Updated',
+                          value: _formatDateTime(record.updatedAt!),
+                          icon: Icons.edit_calendar,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 32),
             ],
           );
@@ -256,6 +302,34 @@ class MedicalRecordDetailScreen extends ConsumerWidget {
       }
     }
   }
+
+  String _formatDate(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    final date = _formatDate(dateTime);
+    final time =
+        '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    return '$date at $time';
+  }
+
+  Color _getTypeColor(String type) {
+    switch (type.toLowerCase()) {
+      case 'vaccination':
+        return Colors.blue;
+      case 'checkup':
+        return Colors.green;
+      case 'treatment':
+        return Colors.orange;
+      case 'surgery':
+        return Colors.red;
+      case 'medication':
+        return Colors.purple;
+      default:
+        return AppColors.primaryGreen;
+    }
+  }
 }
 
 class _InfoRow extends StatelessWidget {
@@ -289,14 +363,36 @@ class _InfoRow extends StatelessWidget {
             ),
           ],
         ),
-        Text(
-          value,
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            color: valueColor,
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: valueColor,
+            ),
           ),
         ),
       ],
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String title;
+
+  const _SectionTitle(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
+      ),
     );
   }
 }

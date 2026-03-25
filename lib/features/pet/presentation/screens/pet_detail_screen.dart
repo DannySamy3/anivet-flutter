@@ -17,6 +17,8 @@ class PetDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final petQuery = ref.watch(petDetailProvider(petId));
+    final appointmentsQuery = ref.watch(upcomingAppointmentsProvider(petId));
+
     return petQuery.when(
       data: (pet) => Scaffold(
         appBar: AppBar(
@@ -110,6 +112,144 @@ class PetDetailScreen extends ConsumerWidget {
                         label: 'Weight',
                         value: '${pet.weight} kg',
                       ),
+                    const SizedBox(height: 24),
+                    // Upcoming Events Section
+                    appointmentsQuery.when(
+                      data: (appointments) {
+                        if (appointments.isNotEmpty) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Text(
+                                  'Upcoming Events',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.primaryGreen,
+                                      ),
+                                ),
+                              ),
+                              ...appointments.map((apt) {
+                                return Card(
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              apt.title,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyLarge
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                            ),
+                                            Text(
+                                              apt.getDaysUntil(),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .labelSmall
+                                                  ?.copyWith(
+                                                    color: apt.isSoon
+                                                        ? Colors.orange
+                                                        : AppColors
+                                                            .primaryGreen,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          _formatDate(apt.scheduledDate),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                color: AppColors.textSecondary,
+                                              ),
+                                        ),
+                                        if (apt.description != null)
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 8),
+                                            child: Text(
+                                              apt.description!,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodySmall,
+                                            ),
+                                          ),
+                                        if (apt.veterinarian != null)
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 8),
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.person,
+                                                  size: 14,
+                                                  color: AppColors.primaryGreen,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  apt.veterinarian!,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .labelSmall,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              const SizedBox(height: 24),
+                            ],
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                      loading: () => const Padding(
+                        padding: EdgeInsets.all(16),
+                        child: CircularProgressIndicator(),
+                      ),
+                      error: (_, __) => const SizedBox.shrink(),
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () =>
+                            context.push('/medical-records?petId=${pet.id}'),
+                        icon: const Icon(Icons.medical_information),
+                        label: const Text(
+                          'View Medical Records',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: AppColors.primaryGreen,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 16),
                   ],
                 ),
@@ -156,6 +296,10 @@ class PetDetailScreen extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')} at ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
   }
 
   void _showDeleteDialog(BuildContext context, WidgetRef ref) {

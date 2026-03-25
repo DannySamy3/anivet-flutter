@@ -77,11 +77,6 @@ class PetListScreen extends ConsumerWidget {
           onRetry: () => ref.invalidate(myPetsProvider),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/pets/add'),
-        icon: const Icon(Icons.add),
-        label: const Text(AppStrings.addPet),
-      ),
     );
   }
 }

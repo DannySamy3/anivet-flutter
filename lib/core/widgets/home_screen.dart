@@ -236,7 +236,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 Color(0xFF5C6BC0),
                                 Color(0xFF7986CB)
                               ],
-                              onTap: () => context.push('/products'),
+                              onTap: () => context.push('/store'),
                             ),
                             const SizedBox(width: 14),
                             _ServiceBanner(
